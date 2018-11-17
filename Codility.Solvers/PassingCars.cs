@@ -28,6 +28,7 @@ namespace Codility.Solvers
         public int Amount()
         {
             var totalPassing = 0L;
+            var westIndex = 0;
             for (int eastIndex = 0; eastIndex < _toEast.Count;)
             {
                 var followingWest = FollowingWest(eastIndex);
@@ -35,7 +36,7 @@ namespace Codility.Solvers
                 if (goingEast <= 0)
                     break;
 
-                var westIndex = IndexByValue(followingWest);
+                westIndex = IndexByValue(westIndex, followingWest);
                 if (westIndex < 0)
                     break;
 
@@ -52,9 +53,11 @@ namespace Codility.Solvers
             return (int)totalPassing;
         }
 
-        private int IndexByValue(int value)
+        private int IndexByValue(int startToSearchAt, int value)
         {
-            return _toWest.IndexOf(value);
+            //as it turned out this change was crucial to make whole algorithm run in O(n)
+            //ideally there should be binary search, as the list is guarantee to be ascendingly sorted
+            return _toWest.IndexOf(value, startToSearchAt);
         }
 
         private int FollowingWest(int currentEast)

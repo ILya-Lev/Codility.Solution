@@ -1,12 +1,22 @@
 using Codility.Solvers;
 using FluentAssertions;
+using System;
+using System.Diagnostics;
 using System.Linq;
 using Xunit;
+using Xunit.Sdk;
 
 namespace Codility.Tests
 {
-    public class PassingCarsTests
+    public class PassingCarsTests : IClassFixture<TestOutputHelper>
     {
+        private readonly TestOutputHelper _outputHelper;
+
+        public PassingCarsTests(TestOutputHelper outputHelper)
+        {
+            _outputHelper = outputHelper;
+        }
+
         [Fact]
         public void Amount_OnePair_1()
         {
@@ -74,6 +84,21 @@ namespace Codility.Tests
             var passingTotal = solver.Amount();
 
             passingTotal.Should().Be(-1);
+        }
+
+        [Fact]
+        public void Amount_LargeRandom_Fast()
+        {
+            var random = new Random(DateTime.UtcNow.Millisecond);
+            var cars = Enumerable.Range(1, 1_000_000).Select(n => random.Next(0, 2)).ToArray();
+
+            var stopWatch = Stopwatch.StartNew();
+            var solver = new PassingCars(cars);
+            var passingTotal = solver.Amount();
+            stopWatch.Start();
+
+            stopWatch.ElapsedMilliseconds.Should().BeLessOrEqualTo(1000);
+            _outputHelper.WriteLine($"elapsed {stopWatch.Elapsed}");
         }
     }
 }
