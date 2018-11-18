@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Codility.Solvers
 {
@@ -13,39 +14,58 @@ namespace Codility.Solvers
             ['T'] = 4,
         };
 
-        public IEnumerable<int> MinImpactFactors(string nucleotids, int[] starts, int[] ends)
+        private readonly List<int>[] _indexByImpactFactor;
+
+        public GenomicRangeQuery(string nucleotids)
+        {
+            _indexByImpactFactor = new[]
+            {
+                new List<int>(),
+                new List<int>(),
+                new List<int>(),
+                new List<int>(),
+            };
+
+            var nucleotidsArray = nucleotids.ToCharArray();
+            for (int i = 0; i < nucleotidsArray.Length; i++)
+            {
+                var nucleotid = nucleotidsArray[i];
+                var groupIndex = _impactFactors[nucleotid] - 1;
+                _indexByImpactFactor[groupIndex].Add(i);
+            }
+        }
+
+        public IEnumerable<int> MinImpactFactors(int[] starts, int[] ends)
         {
             if (starts.Length != ends.Length)
             {
                 throw new ArgumentException($"starts {starts.Length} should have the same count as ends {ends.Length}");
             }
 
-            var nucleotidsArray = nucleotids.ToCharArray();
-
             for (int pairIndex = 0; pairIndex < starts.Length; pairIndex++)
             {
-                yield return GetMinimalImpactFactor(nucleotidsArray, starts[pairIndex], ends[pairIndex]);
+                yield return GetMinimalImpactFactor(starts[pairIndex], ends[pairIndex]);
             }
         }
 
-        private int GetMinimalImpactFactor(char[] nucleotids, int start, int end)
+        private int GetMinimalImpactFactor(int start, int end)
         {
-            if (end > nucleotids.Length)
-                throw new Exception($"end {end} is to big - there are only {nucleotids.Length} symbols");
-
-            var minFactor = 4;
-            for (int i = start; i <= end; i++)
+            for (int groupIndex = 0; groupIndex < _indexByImpactFactor.Length - 1; groupIndex++)
             {
-                var currentFactor = _impactFactors[nucleotids[i]];
-                if (currentFactor < minFactor)
+                var currentGroup = _indexByImpactFactor[groupIndex];
+                if (Intersects(start, end, currentGroup))
                 {
-                    if (currentFactor == 1)
-                        return 1;
-                    minFactor = currentFactor;
+                    if (currentGroup.Any(idx => idx >= start && idx <= end))
+                        return groupIndex + 1;
                 }
             }
 
-            return minFactor;
+            return 4;   //the largest one
+        }
+
+        private static bool Intersects(int start, int end, List<int> currentGroup)
+        {
+            return start <= currentGroup[currentGroup.Count - 1] && end >= currentGroup[0];
         }
     }
 }
