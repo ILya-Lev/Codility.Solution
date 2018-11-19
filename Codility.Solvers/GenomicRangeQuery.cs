@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Codility.Solvers
 {
@@ -14,24 +13,26 @@ namespace Codility.Solvers
             ['T'] = 4,
         };
 
-        private readonly List<int>[] _indexByImpactFactor;
+        private readonly List<int>[] _impactIndexes;
 
         public GenomicRangeQuery(string nucleotids)
         {
-            _indexByImpactFactor = new[]
+            var nucleotidsArray = nucleotids.ToCharArray();
+
+            _impactIndexes = new[]
             {
-                new List<int>(),
-                new List<int>(),
-                new List<int>(),
-                new List<int>(),
+                new List<int>(nucleotidsArray.Length/4),
+                new List<int>(nucleotidsArray.Length/4),
+                new List<int>(nucleotidsArray.Length/4),
+                new List<int>(nucleotidsArray.Length/4)
             };
 
-            var nucleotidsArray = nucleotids.ToCharArray();
             for (int i = 0; i < nucleotidsArray.Length; i++)
             {
                 var nucleotid = nucleotidsArray[i];
-                var groupIndex = _impactFactors[nucleotid] - 1;
-                _indexByImpactFactor[groupIndex].Add(i);
+                var impactFactor = _impactFactors[nucleotid];
+
+                _impactIndexes[impactFactor - 1].Add(i);
             }
         }
 
@@ -50,22 +51,48 @@ namespace Codility.Solvers
 
         private int GetMinimalImpactFactor(int start, int end)
         {
-            for (int groupIndex = 0; groupIndex < _indexByImpactFactor.Length - 1; groupIndex++)
+            for (int groupIndex = 0; groupIndex < _impactIndexes.Length; groupIndex++)
             {
-                var currentGroup = _indexByImpactFactor[groupIndex];
-                if (Intersects(start, end, currentGroup))
-                {
-                    if (currentGroup.Any(idx => idx >= start && idx <= end))
-                        return groupIndex + 1;
-                }
+                var factorIndexes = _impactIndexes[groupIndex];
+                var firstGreaterOrEqual = GetFirstGreaterOrEqual(factorIndexes, start);
+
+                if (firstGreaterOrEqual != -1 && firstGreaterOrEqual <= end)
+                    return groupIndex + 1;
             }
 
-            return 4;   //the largest one
+            return 4;
         }
 
-        private static bool Intersects(int start, int end, List<int> currentGroup)
+        private int GetFirstGreaterOrEqual(List<int> factorIndexes, int value)
         {
-            return start <= currentGroup[currentGroup.Count - 1] && end >= currentGroup[0];
+            if (factorIndexes.Count == 0)
+                return -1;
+
+            int start = 0, end = factorIndexes.Count;
+            int targetIndex = -1;
+            int middle = (start + end) / 2;
+            int previousMiddle = 0;
+            do
+            {
+                if (value == factorIndexes[middle])
+                    return value;
+
+                if (value > factorIndexes[middle])
+                {
+                    start = middle;
+                }
+                else if (value < factorIndexes[middle])
+                {
+                    targetIndex = middle;
+                    end = middle;
+                }
+
+                previousMiddle = middle;
+                middle = (start + end) / 2;
+
+            } while (middle < end && previousMiddle != middle);
+
+            return targetIndex >= 0 ? factorIndexes[targetIndex] : targetIndex;
         }
     }
 }

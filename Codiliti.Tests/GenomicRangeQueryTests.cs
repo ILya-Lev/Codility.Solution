@@ -1,7 +1,5 @@
 ﻿using Codility.Solvers;
 using FluentAssertions;
-using System;
-using System.Diagnostics;
 using System.Linq;
 using Xunit;
 
@@ -23,20 +21,46 @@ namespace Codility.Tests
         }
 
         [Fact]
-        public void MinImpactFactor_Big_LessThan100Mls()
+        public void MinImpactFactor_DoubleCharacterString_TwoPossibleValues()
         {
-            var random = new Random(DateTime.UtcNow.Millisecond);
-            var code = new[] { 'A', 'C', 'G', 'T' };
-            var sequence = Enumerable.Range(1, 100_000).Select(n => code[n % 4]).ToArray();
-            var starts = Enumerable.Range(1, 50_000).Select(n => random.Next(0, 80_000)).ToArray();
-            var ends = Enumerable.Range(1, 50_000).Select(n => random.Next(20_000, 100_000)).ToArray();
+            var sequence = "TGTTGGGG";
+            var starts = new[] { 4, 5, 2 };
+            var ends = new[] { 7, 5, 3 };
 
-            var stopWatch = Stopwatch.StartNew();
-            var solver = new GenomicRangeQuery(new string(sequence));
+            var solver = new GenomicRangeQuery(sequence);
             var minImpactFactors = solver.MinImpactFactors(starts, ends).ToArray();
-            stopWatch.Stop();
 
-            stopWatch.ElapsedMilliseconds.Should().BeLessOrEqualTo(100);
+            minImpactFactors.Should().Equal(new[] { 3, 3, 4 });
+        }
+
+        [Fact]
+        public void MinImpactFactor_AllChars_Correct()
+        {
+                          //0123456789012345678901
+            var sequence = "ACTGTGCAACTGAGAGCCAATT";
+            var starts = new[] { 0, 5, 2, 7, 15, 20, 1 };
+            var ends = new[] { 21, 5, 3, 10, 17, 21, 6 };
+            var expectation = new[] { 1, 3, 3, 1, 2, 4, 2 };
+
+            var solver = new GenomicRangeQuery(sequence);
+            var minImpactFactors = solver.MinImpactFactors(starts, ends).ToArray();
+
+            minImpactFactors.Should().Equal(expectation);
+        }
+
+        [Fact]
+        public void MinImpactFactor_AlmostAllTheSame_Correct()
+        {
+                          //0123456789012345678901
+            var sequence = "GGGGGGGGGAGGGGGGGGGGGG";
+            var starts = new[] { 0, 0, 0, 9, 10, 20, 9 };
+            var ends = new[] { 21, 8, 9, 21, 21, 20, 9 };
+            var expectation = new[] { 1, 3, 1, 1, 3, 3, 1 };
+
+            var solver = new GenomicRangeQuery(sequence);
+            var minImpactFactors = solver.MinImpactFactors(starts, ends).ToArray();
+
+            minImpactFactors.Should().Equal(expectation);
         }
     }
 }
