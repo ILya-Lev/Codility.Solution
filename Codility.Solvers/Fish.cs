@@ -1,30 +1,38 @@
-﻿namespace Codility.Solvers
+﻿using System.Collections.Generic;
+
+namespace Codility.Solvers
 {
     public class Fish
     {
         public int SurvivalAmount(int[] size, int[] direction)
         {
-            var biggestFishIndex = GetIndexOfMaxElement(size);
-            var biggestFishDirection = direction[biggestFishIndex];
-            return 0;
-        }
-
-        private int GetIndexOfMaxElement(int[] sequence)
-        {
-            if (sequence.Length == 0)
-                return -1;
-            var index = 0;
-            var maxElement = sequence[0];
-            for (int i = 0; i < sequence.Length; i++)
+            var goingUpSurvived = 0;
+            var goingDown = new Stack<int>();
+            for (int fishIndex = 0; fishIndex < direction.Length; fishIndex++)
             {
-                if (maxElement < sequence[i])
+                if (direction[fishIndex] == 1)
                 {
-                    maxElement = sequence[i];
-                    index = i;
+                    goingDown.Push(size[fishIndex]);
+                    continue;
+                }
+
+                if (WillGoingUpSurvive(goingDown, size[fishIndex]))
+                {
+                    goingUpSurvived++;
                 }
             }
 
-            return index;
+            return goingUpSurvived + goingDown.Count;
+        }
+
+        private bool WillGoingUpSurvive(Stack<int> goingDown, int goingUpSize)
+        {
+            while (goingDown.Count > 0 && goingDown.Peek() < goingUpSize)
+            {
+                goingDown.Pop();
+            }
+
+            return goingDown.Count == 0;
         }
     }
 }
