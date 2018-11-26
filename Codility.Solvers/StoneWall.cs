@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace Codility.Solvers
 {
@@ -51,45 +52,56 @@ namespace Codility.Solvers
     {
         public int BricksNumber(int[] heights)
         {
-            if (heights.Length < 2)
-                return heights.Length;
-
-            return BricksNumberInChunk(heights, 0, heights.Length);
+            return BricksNumberOfList(heights.ToList());
         }
 
-        private int BricksNumberInChunk(int[] chunk, int start, int end)
+        private int BricksNumberOfList(List<int> heights)
         {
-            if (end - start < 2)
-                return end - start;
+            if (heights.Count < 2)
+                return heights.Count;
 
-            var minHeight = chunk.Skip(start).Take(end - start).Min();
-
-            var bricksNumber = 1;
-            var areTheSame = true;
-            for (int first = start, last = first + 1; last < end; last++)
+            var bricksNumber = 0;
+            var buildingStack = new Stack<int>();
+            var head = heights[0];
+            foreach (var height in heights)
             {
-                if (chunk[first] > chunk[last] || last == end - 1)
+                if (buildingStack.Count == 0)
                 {
-                    bricksNumber += areTheSame
-                        ? BricksForSameHeightChunk(chunk[first], minHeight)
-                        : BricksNumberInChunk(chunk, first + 1, last);
-
-                    first = last;
-                    areTheSame = true;
+                    head = height;
+                    buildingStack.Push(head);
+                    continue;
                 }
-                else if (areTheSame && chunk[first] < chunk[last])
+
+                if (height == buildingStack.Peek())
+                    continue;
+
+                var headVsHeight = head.CompareTo(height);
+                if (headVsHeight < 0)
+                    buildingStack.Push(height);
+                else if (headVsHeight > 0)
                 {
-                    areTheSame = false;
+                    bricksNumber += BricksInStack(buildingStack);
+                    buildingStack.Clear();
+                    buildingStack.Push(height);
+                    head = height;
                 }
             }
 
-            return bricksNumber;
+            return bricksNumber + BricksInStack(buildingStack);
         }
 
-        private static int BricksForSameHeightChunk(int chunkHeight, int minHeight)
+        private int BricksInStack(Stack<int> buildingStack)
         {
-            return chunkHeight == minHeight ? 0 : 1;
+            if (buildingStack.Count < 2)
+                return buildingStack.Count;
+
+            var chunk = new List<int>(buildingStack.Count);
+            while (buildingStack.Count > 0)
+            {
+                chunk.Add(buildingStack.Pop());
+            }
+
+            return BricksNumberOfList(chunk);
         }
     }
-
 }
