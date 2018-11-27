@@ -85,6 +85,17 @@ namespace Codility.Tests
             bricksNumber.Should().Be(3);
         }
 
+        [Fact]
+        public void BricksNumber_DoubleHill_5()
+        {
+            var heights = new[] { 7, 9, 9, 8, 8, 7, 7, 9, 9, 8, 8, 7 };
+            var solver = new StoneWall();
+
+            var bricksNumber = solver.BricksNumber(heights);
+
+            bricksNumber.Should().Be(5);
+        }
+
 
     }
 }

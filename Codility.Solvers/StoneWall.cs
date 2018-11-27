@@ -62,16 +62,11 @@ namespace Codility.Solvers
 
             var bricksNumber = 0;
             var buildingStack = new Stack<int>();
+            buildingStack.Push(heights[0]);
             var head = heights[0];
-            foreach (var height in heights)
+            for (int i = 1; i < heights.Count; i++)
             {
-                if (buildingStack.Count == 0)
-                {
-                    head = height;
-                    buildingStack.Push(head);
-                    continue;
-                }
-
+                var height = heights[i];
                 if (height == buildingStack.Peek())
                     continue;
 
@@ -84,6 +79,19 @@ namespace Codility.Solvers
                     buildingStack.Clear();
                     buildingStack.Push(height);
                     head = height;
+                }
+                else if (headVsHeight == 0)
+                {
+                    bricksNumber += BricksInStack(buildingStack);
+                    buildingStack.Clear();
+                    
+                    while (i < heights.Count && heights[i] == head)
+                        i++;
+                    
+                    if (i == heights.Count)
+                        break;
+
+                    buildingStack.Push(heights[i]);
                 }
             }
 
