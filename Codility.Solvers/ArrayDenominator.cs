@@ -1,4 +1,5 @@
 ﻿using MoreLinq;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -6,22 +7,34 @@ namespace Codility.Solvers
 {
     public class ArrayDenominator
     {
-        public int GetDenominatorIndex(int[] values)
+        private readonly KeyValuePair<int, int>? _mostFrequentValue;
+        private readonly int[] _values;
+
+        public ArrayDenominator(int[] values)
         {
-            if (values.Length == 0)
+            if (values == null || values.Length == 0)
             {
-                return -1;
+                _mostFrequentValue = null;
             }
+            else
+            {
+                _values = values;
 
-            var frequencies = CalculateFrequencies(values);
-            var mostFrequentValue = GetMostFrequentValue(frequencies);
-
-            if (mostFrequentValue.Value * 2 > values.Length)
-                return IndexOfValue(values, mostFrequentValue.Key);
-            return -1;
+                var frequencies = CalculateFrequencies(values);
+                _mostFrequentValue = GetMostFrequentValue(frequencies);
+            }
         }
 
-        private static KeyValuePair<int,int> GetMostFrequentValue(Dictionary<int, int> frequencies)
+        public bool HasDenominator() => _mostFrequentValue?.Value * 2 > _values?.Length;
+
+        public int? GetDenominator() => HasDenominator() ? _mostFrequentValue?.Key : throw new Exception("There is no denominator!");
+
+        public int GetDenominatorIndex()
+        {
+            return HasDenominator() ? IndexOfValue(_values, _mostFrequentValue.Value.Key) : -1;
+        }
+
+        private static KeyValuePair<int, int> GetMostFrequentValue(Dictionary<int, int> frequencies)
         {
             var maxFrequence = frequencies.First();
             foreach (var pair in frequencies.Skip(1))
