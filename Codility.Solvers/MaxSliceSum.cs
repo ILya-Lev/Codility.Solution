@@ -1,26 +1,29 @@
 ﻿using System;
+using System.Linq;
 
 namespace Codility.Solvers
 {
     public class MaxSliceSum
     {
         /// <summary>
-        /// O(n^2) implementation
+        /// O(n) implementation from codility site materials
+        /// total is a sum so far
+        /// maxTotal is a maximum sum among all possible
+        /// think it over!
+        /// the only modification - for all negative input values
         /// </summary>
-        /// <param name="values"></param>
-        /// <returns></returns>
         public int GetMaxSliceSum(int[] values)
         {
-            long maxTotal = values[0];
+            var maxSingle = values.Max();
+            if (maxSingle <= 0)
+                return maxSingle;
+
+            var total = 0L;
+            var maxTotal = 0L;
             for (int i = 0; i < values.Length; i++)
             {
-                var total = 0L;
-                for (int j = i; j < values.Length; j++)
-                {
-                    total += values[j];
-                    if (total > maxTotal)
-                        maxTotal = total;
-                }
+                total = Math.Max(0, total + values[i]);
+                maxTotal = Math.Max(maxTotal, total);
             }
 
             return Math.Abs(maxTotal) > int.MaxValue

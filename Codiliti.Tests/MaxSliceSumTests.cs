@@ -24,5 +24,23 @@ namespace Codility.Tests
             var maxSum = solver.GetMaxSliceSum(values);
             maxSum.Should().Be(100_000);
         }
+
+        [Fact]
+        public void GetMaxSliceSum_RepeatNegativeBig_SumAll()
+        {
+            var values = Enumerable.Repeat(-1, 100_000).ToArray();
+            var solver = new MaxSliceSum();
+            var maxSum = solver.GetMaxSliceSum(values);
+            maxSum.Should().Be(-1);
+        }
+
+        [Fact]
+        public void GetMaxSliceSum_NegativeBig_SumAll()
+        {
+            var values = Enumerable.Range(-100_000, 100_000).ToArray();
+            var solver = new MaxSliceSum();
+            var maxSum = solver.GetMaxSliceSum(values);
+            maxSum.Should().Be(-1);
+        }
     }
 }
