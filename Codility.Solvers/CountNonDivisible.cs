@@ -1,4 +1,5 @@
 ﻿using MoreLinq;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -12,7 +13,7 @@ namespace Codility.Solvers
             var frequencyTable = FillFrequencyTable(values);
             //O(N*log(N))
             var uniqueIncreasingValues = frequencyTable.Keys.Cast<int>().OrderBy(k => k).ToArray();
-            //O(N^2)
+            //O(N^2) -> O(N) with big coefficient - as each number is factorized
             var counterByUniqueValue = GetAmountByUniqueSortedValue(values, uniqueIncreasingValues, frequencyTable);
             //O(N)
             return values.Select(v => counterByUniqueValue[v]).ToArray();
@@ -34,6 +35,39 @@ namespace Codility.Solvers
         }
 
         private Dictionary<int, int> GetAmountByUniqueSortedValue(int[] values, int[] uniqueIncreasingValues, Dictionary<int, int> frequencyTable)
+        {
+            var counterByUniqueValue = new Dictionary<int, int>();
+            for (int i = 0; i < uniqueIncreasingValues.Length; ++i)
+            {
+                var factors = GetFactors(uniqueIncreasingValues[i]).Distinct().ToArray();
+                
+                var totalDividers = factors
+                    .Where(frequencyTable.ContainsKey)
+                    .Select(f => frequencyTable[f])
+                    .Sum();
+
+
+                var nonDividableCounter = values.Length - totalDividers;
+                counterByUniqueValue.Add(uniqueIncreasingValues[i], nonDividableCounter);
+            }
+
+            return counterByUniqueValue;
+        }
+
+        private IEnumerable<int> GetFactors(int n)
+        {
+            int maxDivider = (int)Math.Ceiling(Math.Sqrt(n));
+            for (int i = 1; i <= maxDivider; i++)
+            {
+                if (n % i == 0)
+                {
+                    yield return i;
+                    yield return n / i;
+                }
+            }
+        }
+
+        private Dictionary<int, int> _GetAmountByUniqueSortedValue(int[] values, int[] uniqueIncreasingValues, Dictionary<int, int> frequencyTable)
         {
             var counterByUniqueValue = new Dictionary<int, int>();
             for (int i = 0; i < uniqueIncreasingValues.Length; ++i)
