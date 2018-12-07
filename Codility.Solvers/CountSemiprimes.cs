@@ -26,7 +26,7 @@ namespace Codility.Solvers
         private HashSet<int> GenerateSemiprimesSequence(int to)
         {
             var semiprimes = new HashSet<int>();
-            var primes = Enumerable.Range(1, to).Where(IsPrime).ToArray();
+            var primes = Enumerable.Range(1, to / 2 + 1).Where(IsPrime).ToArray();
             for (int i = 0; i < primes.Length && primes[i] * primes[i] < to; i++)
             {
                 for (int j = i; j < primes.Length; j++)
