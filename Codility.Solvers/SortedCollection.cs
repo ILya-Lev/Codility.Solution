@@ -91,7 +91,7 @@ namespace Codility.Solvers
             public int Compare(T x, T y)
             {
                 if (object.ReferenceEquals(y, default(T)))
-                    return object.ReferenceEquals(x, default(T)) ? 0 : 1;
+                    return object.ReferenceEquals(x, default(T)) ? 0 : 1;       //?
                 return y.CompareTo(x);
             }
         }
