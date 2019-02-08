@@ -65,6 +65,14 @@ namespace Codility.Tests
         }
 
         [Fact]
+        public void CalculateDistinctSlices_Overlap_Corect()
+        {
+            var input = new int[] { 3, 4, 1, 2, 0, 1, 7, 8, 9 };
+            var number = new CountDistinctSlices().CalculateDistinctSlices(input);
+            number.Should().Be(15 + 21 - 3);
+        }
+
+        [Fact]
         public void CalculateDistinctSlices_WithMaxMin_ArithmeticSum()
         {
             var input = new int[] { int.MaxValue, int.MinValue, 0, 3 };
