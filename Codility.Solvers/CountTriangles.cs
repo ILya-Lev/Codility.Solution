@@ -13,50 +13,45 @@ namespace Codility.Solvers
 
         private int CountFirstValuesNumber(int[] values)
         {
-            var counter = 0;
-
-            for (int i = 0; i < values.Length - 2; i++)
+            var tripletAmount = 0;
+            for (int i = values.Length - 1; i >= 2; --i)
             {
                 var first = values[i];
-                var secondValuesNumber = CountSecondValuesNumber(values, i + 1, first);
-                counter += secondValuesNumber;
+                var secondValueAmount = CountSecontValueNumber(first, values, i - 1);
+                if (secondValueAmount == 0)
+                    break;
+                tripletAmount += secondValueAmount;
             }
 
-            return counter;
+            return tripletAmount;
         }
 
-        private int CountSecondValuesNumber(int[] values, int start, int first)
+        private int CountSecontValueNumber(int first, int[] values, int start)
         {
-            var secondValuesNumber = 0;
-            for (int j = start; j < values.Length - 1; j++)
+            var tripletAmount = 0;
+            for (int j = start; j >= 1; --j)
             {
                 var second = values[j];
-                var thirdValuesNumber = CountThirdValues(values, j + 1, first, second);
-                if (thirdValuesNumber == 0)
-                {
-                    break;
-                }
+                var threshold = first - second;
+                var tripletExistSince = IndexOfFirstGreater(threshold, values, 0, j - 1);
 
-                secondValuesNumber += thirdValuesNumber;
+                if (tripletExistSince < 0)
+                    break;
+
+                tripletAmount += j - tripletExistSince;
             }
 
-            return secondValuesNumber;
+            return tripletAmount;
         }
 
-        private int CountThirdValues(int[] values, int start, int first, int second)
+        private int IndexOfFirstGreater(int threshold, int[] values, int start, int end)
         {
-            var thirdValuesNumber = 0;
-            for (int k = start; k < values.Length; k++)
-            {
-                var third = values[k];
-                if (first + second <= third)
-                {
-                    break;
-                }
-                thirdValuesNumber++;
-            }
+            if (start == end) return values[start] > threshold ? start : -1;
 
-            return thirdValuesNumber;
+            var middle = (end + start) / 2;
+            return values[middle] > threshold
+                ? IndexOfFirstGreater(threshold, values, start, middle)
+                : IndexOfFirstGreater(threshold, values, middle + 1, end);
         }
     }
 }
