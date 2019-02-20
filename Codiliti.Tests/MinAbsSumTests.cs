@@ -21,7 +21,7 @@ namespace Codility.Tests
         [Fact]
         public void GetMinAbsTotal_Sample1_0()
         {
-            var values = new[] { 3,3,3,4,5 };
+            var values = new[] { 3, 3, 3, 4, 5 };
             var total = new MinAbsSum().GetMinAbsTotal(values);
             total.Should().Be(0);
         }
@@ -29,7 +29,7 @@ namespace Codility.Tests
         [Fact]
         public void GetMinAbsTotal_2to20_1()
         {
-            var values = Enumerable.Range(2,19).ToArray();
+            var values = Enumerable.Range(2, 19).ToArray();
             var total = new MinAbsSum().GetMinAbsTotal(values);
             total.Should().Be(1);
         }
@@ -64,6 +64,15 @@ namespace Codility.Tests
         {
             var random = new Random(DateTime.UtcNow.Millisecond);
             var values = Enumerable.Repeat(7, 99_999).Select(n => random.Next(0, 2) == 0 ? -n : n).ToArray();
+            var total = new MinAbsSum().GetMinAbsTotal(values);
+            total.Should().Be(7);
+        }
+
+        [Fact]
+        public void GetMinAbsTotal_AllTheSameOddAmountSmall_Item()
+        {
+            var random = new Random(DateTime.UtcNow.Millisecond);
+            var values = Enumerable.Repeat(7, 999).Select(n => random.Next(0, 2) == 0 ? -n : n).ToArray();
             var total = new MinAbsSum().GetMinAbsTotal(values);
             total.Should().Be(7);
         }

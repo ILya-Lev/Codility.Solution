@@ -12,9 +12,28 @@ namespace Codility.Solvers
             if (numbers == null || numbers.Length == 0) return 0;
 
             var descendingAbs = ToDescendingAbs(numbers);
-            var minAbsTotal = TraverseOptimalPath(descendingAbs);
+            var minAbsTotal = descendingAbs.Length > 1_000
+                ? TraverseOptimalPath(descendingAbs)
+                : TraverseAllPathes(descendingAbs);
 
             return minAbsTotal;
+        }
+
+        private int TraverseAllPathes(int[] values)
+        {
+            var state = new HashSet<int>() { values[0] };
+            foreach (var value in values.Skip(1))
+            {
+                var nextState = new HashSet<int>();
+                foreach (var subState in state)
+                {
+                    nextState.Add(Math.Abs(subState + value));
+                    nextState.Add(Math.Abs(subState - value));
+                }
+                state = nextState;
+            }
+
+            return state.Min();
         }
 
         private int TraverseOptimalPath(int[] descendingAbs)
