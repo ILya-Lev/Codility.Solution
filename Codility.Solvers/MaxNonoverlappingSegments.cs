@@ -1,11 +1,9 @@
-﻿using System;
-using System.Collections.Concurrent;
+﻿using MoreLinq;
+
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using MoreLinq;
 
 namespace Codility.Solvers
 {
@@ -31,13 +29,14 @@ namespace Codility.Solvers
                 yield return lessIntersected;
 
                 var itsIntersectings = segmentWithIntersected[lessIntersected];
-                foreach (var itsIntersecting in itsIntersectings)
+                while (itsIntersectings.Count > 0)
                 {
-                    //var subIntersectings = segmentWithIntersected[itsIntersecting];
-                    //foreach (var subIntersecting in subIntersectings.Where(i => i != itsIntersecting))
-                    //{
-                    //    segmentWithIntersected[subIntersecting].Remove(itsIntersecting);
-                    //}
+                    var itsIntersecting = itsIntersectings.First();
+                    var subIntersectings = segmentWithIntersected[itsIntersecting];
+                    foreach (var subIntersecting in subIntersectings.Where(i => i != itsIntersecting))
+                    {
+                        segmentWithIntersected[subIntersecting].Remove(itsIntersecting);
+                    }
                     segmentWithIntersected.Remove(itsIntersecting);
                 }
                 segmentWithIntersected.Remove(lessIntersected);
@@ -48,8 +47,11 @@ namespace Codility.Solvers
         {
             var min = int.MaxValue;
             Segment lessIntersectedSegment = null;
-            foreach (var item in segmentWithIntersected.Select(p => new{p.Key, p.Value.Count}))
+            foreach (var item in segmentWithIntersected.Select(p => new { p.Key, p.Value.Count }))
             {
+                if (item.Count == 0)
+                    return item.Key;
+
                 if (min > item.Count)
                 {
                     min = item.Count;

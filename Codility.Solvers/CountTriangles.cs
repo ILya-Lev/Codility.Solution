@@ -17,7 +17,7 @@ namespace Codility.Solvers
             for (int i = values.Length - 1; i >= 2; --i)
             {
                 var first = values[i];
-                var secondValueAmount = CountSecontValueNumber(first, values, i - 1);
+                var secondValueAmount = CountSecondValueNumber(first, values, i - 1);
                 if (secondValueAmount == 0)
                     break;
                 tripletAmount += secondValueAmount;
@@ -26,7 +26,7 @@ namespace Codility.Solvers
             return tripletAmount;
         }
 
-        private int CountSecontValueNumber(int first, int[] values, int start)
+        private int CountSecondValueNumber(int first, int[] values, int start)
         {
             var tripletAmount = 0;
             for (int j = start; j >= 1; --j)

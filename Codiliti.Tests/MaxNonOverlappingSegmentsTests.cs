@@ -1,9 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Codility.Solvers;
+﻿using Codility.Solvers;
+
 using FluentAssertions;
+
+using System.Linq;
+
 using Xunit;
 
 namespace Codility.Tests
@@ -24,8 +24,8 @@ namespace Codility.Tests
         [Fact]
         public void GetLargestSize_Empty_0()
         {
-            var heads = new int [0];
-            var tails = new int [0];
+            var heads = new int[0];
+            var tails = new int[0];
 
             var size = new MaxNonOverlappingSegments().GetLargestSize(heads, tails);
 
@@ -46,13 +46,13 @@ namespace Codility.Tests
         [Fact]
         public void GetLargestSize_NoOverlapping_All()
         {
-            var limit = 20_000;
-            var heads = Enumerable.Range(1, limit).Where(n => n%2 == 1).ToArray();
-            var tails = Enumerable.Range(1, limit).Where(n => n%2 == 0).ToArray();
+            var limit = 30_000;
+            var heads = Enumerable.Range(1, limit).Where(n => n % 2 == 1).ToArray();
+            var tails = Enumerable.Range(1, limit).Where(n => n % 2 == 0).ToArray();
 
             var size = new MaxNonOverlappingSegments().GetLargestSize(heads, tails);
 
-            size.Should().Be(limit/2);
+            size.Should().Be(limit / 2);
         }
 
     }
