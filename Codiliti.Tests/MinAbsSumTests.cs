@@ -25,6 +25,14 @@ namespace Codility.Tests
             var total = new MinAbsSum().GetMinAbsTotal(values);
             total.Should().Be(0);
         }
+        
+        [Fact]
+        public void GetMinAbsTotal_Sample2_1()
+        {
+            var values = new[] { 1, -3, 5, 8, 0, -4 };
+            var total = new MinAbsSum().GetMinAbsTotal(values);
+            total.Should().Be(1);
+        }
 
         [Fact]
         public void GetMinAbsTotal_2to20_1()

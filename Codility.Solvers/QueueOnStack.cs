@@ -37,6 +37,104 @@ namespace Codility.Solvers
         }
     }
 
+    //public class QueueOnStack0<T>
+    //{
+    //    /// <summary>
+    //    /// Stack for enqueue operations
+    //    /// </summary>
+    //    protected Stack<T> ForwardStack { get; } = new Stack<T>();
+
+    //    /// <summary>
+    //    /// Stack for dequeue operations
+    //    /// </summary>
+    //    protected Stack<T> BackwardStack { get; } = new Stack<T>();
+
+    //    /// <summary>
+    //    /// Fill target stack from source stack.
+    //    /// </summary>
+    //    /// <param name="from">source stack</param>
+    //    /// <param name="to">target stack</param>
+    //    protected static void Refill(Stack<T> from, Stack<T> to)
+    //    {
+    //        while (from.Count > 0)
+    //            to.Push(from.Pop());
+    //    }
+
+    //    public virtual void Enqueue(T item)
+    //    {
+    //        if (BackwardStack.Count > 0)
+    //            Refill(from: BackwardStack, to: ForwardStack);
+
+    //        ForwardStack.Push(item);
+    //    }
+
+    //    public virtual T Dequeue()
+    //    {
+    //        if (ForwardStack.Count > 0)
+    //            Refill(from: ForwardStack, to: BackwardStack);
+
+    //        return BackwardStack.Pop();
+    //    }
+
+    //    public virtual T GetHead()
+    //    {
+    //        if (ForwardStack.Count > 0)
+    //            Refill(from: ForwardStack, to: BackwardStack);
+
+    //        return BackwardStack.Peek();
+    //    }
+
+    //    public int Count => ForwardStack.Count + BackwardStack.Count;
+
+    //    public bool IsEmpty => Count == 0;
+    //}
+
+    //public class QueueOnStack<T> : QueueOnStack0<T>
+    //{
+    //    /// <summary>
+    //    /// Holds head item.
+    //    /// </summary>
+    //    private T _head;
+
+    //    public override void Enqueue(T item)
+    //    {
+    //        if (BackwardStack.Count > 0)
+    //            Refill(from: BackwardStack, to: ForwardStack);
+
+    //        // if first item set head
+    //        if (IsEmpty)
+    //            _head = item;
+
+    //        ForwardStack.Push(item);
+    //    }
+
+    //    public override T Dequeue()
+    //    {
+    //        if (ForwardStack.Count > 0)
+    //            Refill(from: ForwardStack, to: BackwardStack);
+
+    //        var value = BackwardStack.Pop();
+
+    //        // change head after taking first item
+    //        if (!IsEmpty)
+    //            _head = BackwardStack.Peek();
+
+    //        return value;
+    //    }
+
+    //    /// <summary>
+    //    /// Gets stored head.
+    //    /// </summary>
+    //    /// <exception cref="InvalidOperationException">Throwed when queueu is empty</exception>
+    //    public override T GetHead()
+    //    {
+    //        if (IsEmpty)
+    //            throw new InvalidOperationException("Queue is empty.");
+
+    //        return _head;
+    //    }
+    //}
+
     /// <summary>
     /// my implementation is 2 times faster. why?
     /// </summary>

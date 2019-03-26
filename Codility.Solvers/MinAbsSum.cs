@@ -71,4 +71,75 @@ namespace Codility.Solvers
             }
         }
     }
+
+    //public class MinAbsSum
+    //{
+    //    /// <summary>
+    //    /// holds limit of calculation
+    //    /// </summary>
+    //    private long Limit;
+
+    //    public int GetMinAbsTotal(int[] input)
+    //    {
+    //        // order abs values
+    //        var sorted = input
+    //            .Select(i => i < 0 ? -i : i) // abs values
+    //            .OrderByDescending(i => i);
+
+    //        // get full sum
+    //        long sum = 0;
+    //        foreach (var i in sorted)
+    //            sum += i;
+
+    //        // not always 0 reachable
+    //        Limit = sum % 2;
+
+    //        long halfSum = sum / 2;
+    //        long globalMin = int.MaxValue;
+
+    //        var list = sorted.ToList();
+    //        while (list.Any())
+    //        {
+    //            // taking items one by one from largest to smalest
+    //            long currentMin = halfSum - list.First();
+    //            list.RemoveAt(0);
+
+    //            // proceed combinations to find half of sum
+    //            // other half should go negative to reach min 
+    //            currentMin = ProceedCombinations(list, currentMin);
+
+    //            globalMin = currentMin < globalMin ? currentMin : globalMin;
+
+    //            if (globalMin == Limit) break; // limit reached
+    //        }
+
+    //        return (int)globalMin;
+    //    }
+
+    //    private long ProceedCombinations(IEnumerable<int> opList, long halfSum)
+    //    {
+    //        long negate = halfSum, positive = halfSum;
+    //        foreach (var i in opList)
+    //        {
+    //            // reminder positive
+    //            if (positive - i >= 0)
+    //            {
+    //                positive -= i;
+    //                if (positive == Limit)
+    //                    return Limit; // limit reached!
+    //            }
+
+    //            // reminder negate 
+    //            else if ((i - positive) < negate)
+    //            {
+    //                negate = i - positive;
+    //                if (negate == Limit)
+    //                    return Limit; // limit reached!
+    //            }
+    //        }
+
+    //        // return min reminder
+    //        return positive < negate ? positive : negate;
+    //    }
+    //}
 }
