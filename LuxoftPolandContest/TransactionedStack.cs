@@ -42,7 +42,7 @@ namespace LuxoftPolandContest
             var lastTransaction = _transactions.LastOrDefault();
             if (lastTransaction == null)
                 return false;
-            
+
             lastTransaction.Rollback(_values);
             _transactions.RemoveAt(_transactions.Count - 1);
             return true;
@@ -65,15 +65,17 @@ namespace LuxoftPolandContest
         private class StackTransaction
         {
             private readonly List<Operation> _history = new List<Operation>();
+
+            public void Add(int value) => SaveOperation(new Operation(value, true));
             
-            public void Add(int value) => _history.Add(new Operation(value, true));
-            public void Remove(int value) => _history.Add(new Operation(value, false));
+            public void Remove(int value) => SaveOperation(new Operation(value, false));
+            
             public void Rollback(List<int> values)
             {
                 for (int i = _history.Count - 1; i >= 0; --i)
                 {
                     if (_history[i].Inserted)
-                        values.RemoveAt(values.Count-1);
+                        values.RemoveAt(values.Count - 1);
                     else
                         values.Add(_history[i].Value);
                 }
@@ -82,6 +84,16 @@ namespace LuxoftPolandContest
             public void CopyHistoryFrom(StackTransaction nestedTransaction)
             {
                 _history.AddRange(nestedTransaction._history);
+            }
+
+            private void SaveOperation(Operation currentOperation)
+            {
+                var previousOperation = _history.LastOrDefault();
+
+                if (currentOperation.IsOppositeTo(previousOperation))
+                    _history.RemoveAt(_history.Count - 1);
+                else
+                    _history.Add(currentOperation);
             }
 
             private class Operation
@@ -93,6 +105,11 @@ namespace LuxoftPolandContest
                 {
                     Value = value;
                     Inserted = inserted;
+                }
+
+                public bool IsOppositeTo(Operation other)
+                {
+                    return other != null && other.Value == Value && other.Inserted != Inserted;
                 }
             }
         }
