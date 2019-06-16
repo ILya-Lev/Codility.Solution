@@ -21,9 +21,11 @@ namespace Codility.Solvers
         {
             var bigger = Math.Max(a, b);
             var smaller = Math.Min(a, b);
-            if (bigger % smaller == 0)
+
+            var modulo = bigger % smaller;
+            if (modulo == 0)
                 return smaller;
-            return CalculateLCF(bigger % smaller, smaller);
+            return CalculateLCF(modulo, smaller);
         }
     }
 }
