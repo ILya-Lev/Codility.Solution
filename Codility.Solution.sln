@@ -1,15 +1,17 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.28010.2050
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29411.138
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Codility.Solvers", "Codility.Solvers\Codility.Solvers.csproj", "{B800BD30-2BD2-4FCD-BA2F-32F00BC38C34}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Codility.Tests", "Codiliti.Tests\Codility.Tests.csproj", "{069F7393-10F4-4C75-80E8-856BEED84C9D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LuxoftPolandContest", "LuxoftPolandContest\LuxoftPolandContest.csproj", "{3E0346AB-3846-4648-8EBF-3ACD7BC8ECE8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LuxoftPolandContest", "LuxoftPolandContest\LuxoftPolandContest.csproj", "{3E0346AB-3846-4648-8EBF-3ACD7BC8ECE8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LuxoftPolandContest.Tests", "LuxoftPolandContest.Tests\LuxoftPolandContest.Tests.csproj", "{1AC1D930-8192-48A1-B5FC-7E259515DF03}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LuxoftPolandContest.Tests", "LuxoftPolandContest.Tests\LuxoftPolandContest.Tests.csproj", "{1AC1D930-8192-48A1-B5FC-7E259515DF03}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Luxoft.GeneralCsTest", "Luxoft.GeneralCsTest\Luxoft.GeneralCsTest.csproj", "{D42CB5D5-A615-4A24-ACCF-A2E8A9FADDDE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,10 @@ Global
 		{1AC1D930-8192-48A1-B5FC-7E259515DF03}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1AC1D930-8192-48A1-B5FC-7E259515DF03}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1AC1D930-8192-48A1-B5FC-7E259515DF03}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D42CB5D5-A615-4A24-ACCF-A2E8A9FADDDE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D42CB5D5-A615-4A24-ACCF-A2E8A9FADDDE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D42CB5D5-A615-4A24-ACCF-A2E8A9FADDDE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D42CB5D5-A615-4A24-ACCF-A2E8A9FADDDE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
