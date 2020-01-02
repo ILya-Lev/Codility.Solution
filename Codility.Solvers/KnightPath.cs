@@ -81,12 +81,14 @@ namespace Codility.Solvers.Knight
     public class KnightPath
     {
         private readonly Board _board;
+        private readonly BestPositionStrategy _strategy;
         private readonly Func<int, int, IReadOnlyList<(int r, int c)>> _figureSteps;
 
         /// <summary> start position </summary>
-        public KnightPath(Board board, Func<int, int, IReadOnlyList<(int, int)>> figureSteps)
+        public KnightPath(Board board, Func<int, int, IReadOnlyList<(int, int)>> figureSteps, BestPositionStrategy strategy)
         {
             _board = board;
+            _strategy = strategy;
             _figureSteps = figureSteps ?? FigureStep.KnightSteps;
         }
 
@@ -104,7 +106,7 @@ namespace Codility.Solvers.Knight
 
             while (stepNumber < Board.Size * Board.Size && _board.ContainUnvisitedCells())
             {
-                (int nextRow, int nextColumn) = FindBestPosition(r, c);
+                (int nextRow, int nextColumn) = _strategy.FindBestPosition(r, c);
                 r = nextRow;
                 c = nextColumn;
 
@@ -114,40 +116,7 @@ namespace Codility.Solvers.Knight
 
             return steps;
         }
-
-        private (int, int) FindBestPosition(in int r, in int c)
-        {
-            try
-            {
-                var nextPosition = GetValidSteps(r, c)
-                    .Select(p => new
-                    {
-                        FurtherStepsCount = _board[p.r, p.c],
-                        //OneMoreFurtherStepCount = GetValidSteps(p.r, p.c)
-                        //    .Where(coord => coord.r != p.r || coord.c != p.c)
-                        //    .Select(coord => _board[coord.r, coord.c])
-                        //    .Min(),
-                        Row = p.r,
-                        Column = p.c
-                    })
-                    .MinBy(item => item.FurtherStepsCount/* + item.OneMoreFurtherStepCount*/)
-                    .First();
-
-                return (nextPosition.Row, nextPosition.Column);
-            }
-            catch (Exception exc)
-            {
-                throw;
-            }
-        }
-
-        private IEnumerable<(int r, int c)> GetValidSteps(int r, int c)
-        {
-            return _figureSteps(r, c)
-                .Where(p => _board.IsWithin(p.r, p.c))
-                .Where(p => _board[p.r, p.c] >= 0);
-        }
-
+        
         private void InitializeBoard()
         {
             _board.Print();
@@ -182,5 +151,99 @@ namespace Codility.Solvers.Knight
                 }
             _board.Print();
         }
+    }
+
+    public class BestPositionStrategy
+    {
+        protected readonly Board _board;
+        protected readonly Func<int, int, IReadOnlyList<(int r, int c)>> _figureSteps;
+
+        /// <summary> start position </summary>
+        public BestPositionStrategy(Board board, Func<int, int, IReadOnlyList<(int, int)>> figureSteps)
+        {
+            _board = board;
+            _figureSteps = figureSteps ?? FigureStep.KnightSteps;
+        }
+
+        public virtual (int, int) FindBestPosition(in int r, in int c)
+        {
+            try
+            {
+                var nextPosition = GetValidSteps(r, c)
+                    .Select(p => new
+                    {
+                        FurtherStepsCount = _board[p.r, p.c],
+                        Row = p.r,
+                        Column = p.c
+                    })
+                    .OrderBy(item => item.FurtherStepsCount)
+                    .First();
+
+                return (nextPosition.Row, nextPosition.Column);
+            }
+            catch (Exception exc)
+            {
+                throw;
+            }
+        }
+
+        
+        protected IEnumerable<(int r, int c)> GetValidSteps(int r, int c)
+        {
+            return _figureSteps(r, c)
+                .Where(p => _board.IsWithin(p.r, p.c))
+                .Where(p => _board[p.r, p.c] >= 0);
+        }
+    }
+
+    public class BestPosition2StepStrategy : BestPositionStrategy
+    {
+        public BestPosition2StepStrategy(Board board, Func<int, int, IReadOnlyList<(int, int)>> figureSteps)
+            : base(board, figureSteps)
+        {
+        }
+
+        public override (int, int) FindBestPosition(in int r, in int c)
+        {
+            try
+            {
+                var nextPosition = GetValidSteps(r, c)
+                    .Select(p => new
+                    {
+                        FurtherStepsCount = _board[p.r, p.c],
+                        OneMoreFurtherStepCount = GetOneMoreFurtherStepCount(p),
+                        Row = p.r,
+                        Column = p.c
+                    })
+                    .OrderBy(item => item.FurtherStepsCount)
+                    .ThenByDescending(item => item.OneMoreFurtherStepCount)
+                    .First();
+
+                return (nextPosition.Row, nextPosition.Column);
+            }
+            catch (Exception exc)
+            {
+                throw;
+            }
+        }
+
+        private int GetOneMoreFurtherStepCount((int r, int c) p)
+        {
+            try
+            {
+                var validSteps = GetValidSteps(p.r, p.c);
+                var amount = validSteps
+                    .Where(coord => coord.r != p.r || coord.c != p.c)
+                    .Select(coord => _board[coord.r, coord.c])
+                    .OrderBy(n => n)
+                    .FirstOrDefault();
+                return amount;
+            }
+            catch (Exception exc)
+            {
+                throw;
+            }
+        }
+
     }
 }

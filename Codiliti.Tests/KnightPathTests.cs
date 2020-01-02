@@ -16,18 +16,39 @@ namespace Codility.Tests
             _output = output;
         }
 
-        [InlineData(0,0)]
-        [InlineData(3,5)]
-        [Theory]
-        public void Traverse_TopLeft_FindPath(in int startRow, in int startColumn)
+        [Fact]
+        public void Traverse_TopLeft_OneStepStrategy_FindPath()
         {
             var sb = new StringBuilder();
             var writer = new StringWriter(sb);
 
             var board = new Board(writer);
-            var solver = new KnightPath(board, FigureStep.KnightSteps);
+            var strategy = new BestPositionStrategy(board, FigureStep.KnightSteps);
+            var solver = new KnightPath(board, FigureStep.KnightSteps, strategy);
 
-            var path = solver.Traverse(startRow, startColumn);
+            var path = solver.Traverse(0,0);
+
+            for (int i = 0; i < path.Count; ++i)
+            {
+                _output.WriteLine($"{i}: {path[i].r} {path[i].c}");
+            }
+
+            _output.WriteLine(sb.ToString());
+
+            board.ContainUnvisitedCells().Should().BeFalse();
+        }
+
+        [Fact]
+        public void Traverse_35_TwoStepStrategy_FindPath()
+        {
+            var sb = new StringBuilder();
+            var writer = new StringWriter(sb);
+
+            var board = new Board(writer);
+            var strategy = new BestPosition2StepStrategy(board, FigureStep.KnightSteps);
+            var solver = new KnightPath(board, FigureStep.KnightSteps, strategy);
+
+            var path = solver.Traverse(3,5);
 
             for (int i = 0; i < path.Count; ++i)
             {
@@ -50,7 +71,8 @@ namespace Codility.Tests
                         continue;
 
                     var board = new Board(null);
-                    var solver = new KnightPath(board, FigureStep.KnightSteps);
+                    var strategy = new BestPositionStrategy(board, FigureStep.KnightSteps);
+                    var solver = new KnightPath(board, FigureStep.KnightSteps, strategy);
                     var path = solver.Traverse(i, j);
 
                     _output.WriteLine($"start position {i}, {j}");
