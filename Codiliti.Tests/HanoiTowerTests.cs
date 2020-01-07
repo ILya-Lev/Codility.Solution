@@ -1,6 +1,7 @@
 ﻿using Codility.Solvers.Hanoi;
 using FluentAssertions;
 using System;
+using Codility.Solvers.HanoiObjects;
 using Xunit;
 using Xunit.Sdk;
 
@@ -32,6 +33,34 @@ namespace Codility.Tests
             {
                 _output.WriteLine($"disk # {step.DiskNumber} goes from {step.OriginStick} to {step.TargetStick}");
             }
+        }
+    }
+
+    public class HanoiGameSolverTests : IClassFixture<TestOutputHelper>
+    {
+        private readonly TestOutputHelper _output;
+
+        public HanoiGameSolverTests(TestOutputHelper output)
+        {
+            _output = output;
+        }
+
+        [InlineData(3, 7)]
+        [InlineData(0, 0)]
+        [InlineData(1, 1)]
+        [InlineData(4, 15)]
+        [Theory]
+        public void Solve_N_2powNMin1(in int n, in int stepsAmount)
+        {
+            var solver = new HanoiGameSolver(n);
+            
+            solver.Solve();
+            
+            var log = solver.GetLog();
+            _output.WriteLine(log);
+            log.Split("\n", StringSplitOptions.RemoveEmptyEntries)
+                .Should()
+                .HaveCount(stepsAmount);
         }
     }
 }
