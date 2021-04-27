@@ -7,9 +7,9 @@ using Xunit;
 namespace LeetCode.Tests
 {
     [Trait("Category", "Unit")]
-    public class P001TwoSumTests
+    public class P0001TwoSumTests
     {
-        private readonly P001TwoSum _sut = new P001TwoSum();
+        private readonly P0001TwoSum _sut = new P0001TwoSum();
 
         [Fact]
         public void TwoSum_NoDuplicates_ContainSolution()

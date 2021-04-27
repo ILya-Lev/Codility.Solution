@@ -3,7 +3,7 @@ using System.Linq;
 
 namespace LeetCode.Tasks
 {
-    public class P001TwoSum
+    public class P0001TwoSum
     {
         public int[] TwoSum(int[] nums, int target)
         {
