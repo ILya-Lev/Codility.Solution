@@ -33,7 +33,7 @@ namespace LeetCode.Tasks
         }
     }
 
-    public static class ListNodeExtensions
+    public static partial class ListNodeExtensions
     {
         public static ListNode FromDirectOrder(this IReadOnlyList<int> source)
         {

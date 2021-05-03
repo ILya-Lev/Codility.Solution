@@ -5,9 +5,9 @@ using Xunit;
 namespace LeetCode.Tests
 {
     [Trait("Category", "Unit")]
-    public class P0002AddTwoNumbersTests
+    public class P0445AddTwoNumbersTests
     {
-        private readonly P0002AddTwoNumbers _sut = new();
+        private readonly P0445AddTwoNumbers _sut = new();
 
         [Fact]
         public void AddTwoNumbers_TheSameLength_SimpleAddition()
