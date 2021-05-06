@@ -8,7 +8,7 @@ namespace LeetCode.Tests
     [Trait("Category", "Unit")]
     public class P0403FrogJumpTests
     {
-        private readonly P0403FrogJump _sut = new();
+        private readonly P0403FrogJump_002 _sut = new();
 
         [Fact]
         public void CanCross_SkipOneStoneInTheMiddle_True()
@@ -30,7 +30,8 @@ namespace LeetCode.Tests
             var stones = new int[0];
             var stones1 = new[] { 0 };
             var stones2 = new[] { 1 };
-            _sut.CanCross(stones).Should().BeFalse();
+            Assert.False(_sut.CanCross(stones));
+            //.Should().BeFalse();
             _sut.CanCross(stones1).Should().BeFalse();
             _sut.CanCross(stones2).Should().BeFalse();
         }
@@ -46,7 +47,7 @@ namespace LeetCode.Tests
         public void CanCross_ManyStones_False()
         {
             //var a = 998;//last consecutive item
-            var a = 30;//last consecutive item
+            var a = 38;//last consecutive item
             //var d = 37;//delta between the very last and the last but one items
             var d = 37;//delta between the very last and the last but one items
             var stones = Enumerable.Range(0, a + 1).Concat(new[] { a + d }).ToArray();
