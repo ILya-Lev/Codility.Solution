@@ -5,6 +5,11 @@ namespace LeetCode.Tasks
 {
     public class P0003LongestSubstring
     {
+        /// <summary>
+        /// O(n^2) solution
+        /// </summary>
+        /// <param name="s"></param>
+        /// <returns></returns>
         public int FindLongestUniqueLength(string s)
         {
             var maxLength = 0;
