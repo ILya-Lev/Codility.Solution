@@ -16,6 +16,7 @@ namespace LeetCode.Tasks
             return maxLength;
         }
 
+        //todo: think of optimization - return end instead of length and continue on the end, but make sure it still works correctly
         private int GetUniqueSubstringLength(string s, int start)
         {
             var seenCharacters = new HashSet<char>();
