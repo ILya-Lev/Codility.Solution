@@ -7,6 +7,7 @@ using Xunit.Abstractions;
 
 namespace LeetCode.Tests
 {
+    [Trait("Category", "Unit")]
     public class FancyObjectTests
     {
         private readonly ITestOutputHelper _output;

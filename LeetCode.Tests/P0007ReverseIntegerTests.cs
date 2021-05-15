@@ -4,6 +4,7 @@ using Xunit;
 
 namespace LeetCode.Tests
 {
+    [Trait("Category", "Unit")]
     public class P0007ReverseIntegerTests
     {
         private readonly P0007ReverseInteger _sut = new();
