@@ -4,6 +4,9 @@ using System.Linq;
 
 namespace LeetCode.Tasks
 {
+    /// <summary>
+    /// not finished yet!
+    /// </summary>
     public class P0004MedianOfTwoSortedArrays
     {
         public double FindMedianSortedArrays(int[] nums1, int[] nums2)
