@@ -8,11 +8,11 @@ using Xunit.Abstractions;
 namespace LeetCode.Tests
 {
     [Trait("Category", "Unit")]
-    public class P005LongestPalindromicSubstringTests
+    public class P0005LongestPalindromicSubstringTests
     {
         private readonly ITestOutputHelper _output;
-        private readonly P005LongestPalindrome _sut = new();
-        public P005LongestPalindromicSubstringTests(ITestOutputHelper output) => _output = output;
+        private readonly P0005LongestPalindrome _sut = new();
+        public P0005LongestPalindromicSubstringTests(ITestOutputHelper output) => _output = output;
 
         [Fact]
         public void LongestPalindrome_Empty_Empty()

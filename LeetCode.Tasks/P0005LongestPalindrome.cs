@@ -8,7 +8,7 @@ namespace LeetCode.Tasks
     /// could be even better for middle loop not 0-length, but length/2, length/2+-1, ...
     /// taking into account input data
     /// </summary>
-    public class P005LongestPalindrome
+    public class P0005LongestPalindrome
     {
         public string LongestPalindrome(string s)
         {

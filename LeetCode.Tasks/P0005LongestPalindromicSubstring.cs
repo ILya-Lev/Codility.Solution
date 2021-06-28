@@ -5,7 +5,7 @@ namespace LeetCode.Tasks
     /// <summary>
     /// complexity is O(2^n) - too much!
     /// </summary>
-    public class P005LongestPalindromicSubstring
+    public class P0005LongestPalindromicSubstring
     {
         private int _longestSoFar = 0;
         public int OperationsCount { get; private set; }
