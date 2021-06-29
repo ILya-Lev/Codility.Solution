@@ -12,14 +12,14 @@ namespace LeetCode.Tests
         public void Convert_StringLengthEqualNumberOfStrings_TheSame()
         {
             var seed = "PaypalIsHiring";
-            _sut.Convert(seed, seed.Length).Should().Be(seed);
+            _sut.ConvertFast(seed, seed.Length).Should().Be(seed);
         }
 
         [Fact]
         public void Convert_OneSymbol_TheSame()
         {
             var seed = ".";
-            _sut.Convert(seed, seed.Length).Should().Be(seed);
+            _sut.ConvertFast(seed, seed.Length).Should().Be(seed);
         }
 
         [Theory]
@@ -29,7 +29,7 @@ namespace LeetCode.Tests
         [InlineData("abcdefg", 2, "acegbdf")]
         public void Convert_Sample_MatchExpectations(string seed, int rowNumber, string expected)
         {
-            _sut.Convert(seed, rowNumber).Should().Be(expected);
+            _sut.ConvertFast(seed, rowNumber).Should().Be(expected);
         }
 
     }
