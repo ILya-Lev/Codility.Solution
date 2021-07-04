@@ -7,7 +7,7 @@ namespace LeetCode.Tests
     [Trait("Category", "Unit")]
     public class P0009PalindromeNumberTests
     {
-        private readonly P0009PalindromeNumber _sut = new();
+        private readonly P0009PalindromeNumber_InPlace _sut = new();
 
         [Fact]
         public void IsPalindrome_Negative_No()
@@ -27,6 +27,7 @@ namespace LeetCode.Tests
         [InlineData(86511568)]
         [InlineData(906505609)]
         [InlineData(1000000001)]
+        [InlineData(2147447412)]
         public void IsPalindrome_Yes(int x)
         {
             _sut.IsPalindrome(x).Should().BeTrue();
@@ -42,6 +43,8 @@ namespace LeetCode.Tests
         [InlineData(86511528)]
         [InlineData(906505209)]
         [InlineData(1090000001)]
+        [InlineData(int.MaxValue)]
+        [InlineData(1147447412)]
         public void IsPalindrome_No(int x)
         {
             _sut.IsPalindrome(x).Should().BeFalse();

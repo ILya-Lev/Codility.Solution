@@ -22,6 +22,7 @@ namespace LeetCode.Tasks
                 chars[rowNumber].Add(s[i]);
             }
 
+            //consider using Span<char> to reduce memory consumption...
             var result = new List<char>(s.Length);
             foreach (var pair in chars)
             {
