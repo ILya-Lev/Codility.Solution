@@ -9,56 +9,109 @@ namespace LeetCode.Tasks
             var tokens = ParseTokens(p);
 
             var sIdx = 0;
-            int i = 0;
+            var tokenIdx = 0;
+            char? tailChar = null;
 
-            for (; i < tokens.Count && sIdx < s.Length; i++)
+            for (; tokenIdx < tokens.Count; tokenIdx++)
             {
-                var canSkipSome = false;
-                var j = 0;
-                while (i + j < tokens.Count && tokens[i + j].Value == default)
+                var currentToken = tokens[tokenIdx];
+                if (currentToken.Value.HasValue)
                 {
-                    canSkipSome = true;//instead of bool use += at least per token
-                    j++;
-                }
+                    if (tailChar.HasValue)//finish tail
+                    {
+                        while (sIdx < s.Length && s[sIdx] == tailChar)
+                        {
+                            sIdx++;
+                        }
+                    }
 
-                if (i + j >= tokens.Count)
-                    return true;//pattern is equivalent to .*
-                else
-                    i = i + j;
+                    for (int i = 0; i < currentToken.AtLeast; i++)//cover at least amount
+                    {
+                        if (sIdx + i >= s.Length || s[sIdx + i] != currentToken.Value)
+                            return false;
+                    }
 
-                var currentMatch = s.IndexOf(tokens[i].Value.Value, sIdx);
-                if (currentMatch < 0 && tokens[i].AtLeast > 0) return false;//mismatch
-                if (!canSkipSome && currentMatch > sIdx) return false;//there is a gap and it's forbidden
+                    sIdx += currentToken.AtLeast;
 
-                if (currentMatch < 0 && tokens[i].AtLeast == 0)
+                    if (currentToken.AtMost > currentToken.AtLeast)//if there might be a tail
+                    {
+                        if (tokenIdx + 1 >= tokens.Count)//if it's already latest token
+                        {
+                            while (sIdx < s.Length)//but there is only a tail
+                            {
+                                if (s[sIdx++] != currentToken.Value)
+                                    return false;
+                            }
+
+                            return true;
+                        }
+
+                        //---- a*aa. won't be matched
+                        tailChar = currentToken.Value;
+                    }
+                    else
+                    {
+                        tailChar = null;
+                    }
+
                     continue;
-
-                sIdx = currentMatch;//if > it's skipped and is ok; otherwise no change
-
-                var shift = 0;
-                while (shift < tokens[i].AtLeast && sIdx + shift < s.Length)
-                {
-                    if (s[sIdx + shift] != tokens[i].Value)
-                        return false;
-                    shift++;
                 }
 
-                if (shift < tokens[i].AtLeast)
-                    return false;//s is less then needed, e.g. s=aa, p=aaa
-
-                //cover AtMost
-                while (sIdx + shift < s.Length && s[sIdx + shift] == tokens[i].Value && shift < tokens[i].AtMost)
+                // case .
+                //1. tail char is none
+                if (tailChar is null)
                 {
-                    shift++;
+                    for (int i = 0; i < currentToken.AtLeast; i++)//cover at least amount
+                    {
+                        if (sIdx + i >= s.Length)
+                            return false;
+                    }
+
+                    sIdx += currentToken.AtLeast;
+
+                    if (currentToken.AtMost > currentToken.AtLeast)//if there might be a tail
+                    {
+                        if (tokenIdx + 1 >= tokens.Count)//if it's already latest token
+                        {
+                            return true;//as current token is .*
+                        }
+
+                        var nextToken = tokens[tokenIdx + 1];
+                        if (nextToken.Value.HasValue)
+                            while (sIdx < s.Length && s[sIdx] != nextToken.Value)
+                            {
+                                sIdx++;
+                            }
+                        else
+                        {
+                            var newSIdx = s.Length - tokens.Count + tokenIdx;
+                            if (newSIdx > sIdx)
+                                sIdx = newSIdx;
+
+                            continue;
+                        }
+                    }
                 }
-
-                //if (shift > tokens[i].AtMost)
-                //    return false;// having more items then expected, e.g. s=aa vs p=a
-
-                sIdx += shift;
+                //2. tail char is not none
+                var tailLength = 0;
+                while (sIdx + tailLength < s.Length && s[sIdx + tailLength] == tailChar)
+                {
+                    tailLength++;
+                }
+                if (tokenIdx + 1 >= tokens.Count)//if it's already latest token
+                {
+                    return currentToken.AtLeast <= tailLength;
+                }
+                else
+                {//convoluted
+                    var newSIdx = s.Length - tokens.Count + tokenIdx;
+                    if (newSIdx > sIdx)
+                        sIdx = newSIdx;
+                }
             }
 
-            return i >= tokens.Count && sIdx >= s.Length;
+
+            return tokenIdx >= tokens.Count && sIdx >= s.Length;
         }
 
         public static IReadOnlyList<Token> ParseTokens(string pattern)

@@ -22,6 +22,7 @@ namespace LeetCode.Tests
         [InlineData("aaa", "a.a")]
         [InlineData("ab", ".*")]
         [InlineData("aab", "c*a*b")]
+        [InlineData("aaa", "ab*a*c*a")]
         public void IsMatch_Simple_True(string s, string p)
         {
             _sut.IsMatch(s, p).Should().BeTrue();
