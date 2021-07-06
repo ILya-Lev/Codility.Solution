@@ -6,7 +6,7 @@ namespace LeetCode.Tests
 {
     public class P0010RegularExpressionMatchingTests
     {
-        private readonly P0010RegularExpressionMatching _sut = new();
+        private readonly P0010RegularExpressionMatching_001 _sut = new();
 
         [Fact]
         public void IsMatch_WildcardsOnly_True()
@@ -19,6 +19,7 @@ namespace LeetCode.Tests
         [InlineData("aa", "a*a")]
         [InlineData("aa", "a*aa")]
         [InlineData("aaa", "a*a")]
+        [InlineData("aaa", "a.a")]
         [InlineData("ab", ".*")]
         [InlineData("aab", "c*a*b")]
         public void IsMatch_Simple_True(string s, string p)
