@@ -6,7 +6,7 @@ namespace LeetCode.Tests
 {
     public class P0010RegularExpressionMatchingTests
     {
-        private readonly P0010RegularExpressionMatching_001 _sut = new();
+        private readonly P0010RegularExpressionMatching_002 _sut = new();
 
         [Fact]
         public void IsMatch_WildcardsOnly_True()
