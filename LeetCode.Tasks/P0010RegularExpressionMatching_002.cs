@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 
 namespace LeetCode.Tasks
@@ -8,21 +7,16 @@ namespace LeetCode.Tasks
     {
         public bool IsMatch(string s, string p)
         {
-            try
-            {
-                var tokens = ParsePattern(p, s.Length);
-                return IsCovered(tokens, 0, s, 0);
-            }
-            catch (Exception exc)
-            {
-                return false;
-            }
+            var tokens = ParsePattern(p, s.Length);
+            if (tokens is null)
+                return false;//s is too short
+            return IsCovered(tokens, 0, s, 0);
         }
 
         private bool IsCovered(IReadOnlyList<Token> tokens, int firstToken, string s, int sStart)
         {
             if (firstToken >= tokens.Count)//all tokens are processed and non result in failure
-                return sStart >= s.Length;//is string covered completely, or it's too long?
+                return sStart >= s.Length;//is s covered completely, or it's too long?
 
             if (sStart >= s.Length)//whole string is processed
                 return tokens.Skip(firstToken).All(t => t.AtLeast == 0);//are there any mandatory tokens left?
@@ -77,7 +71,7 @@ namespace LeetCode.Tasks
                 token.AtMost = 1;
                 inputRemainder--;
                 if (inputRemainder < 0)
-                    throw new Exception("pattern is longer than input string");
+                    return null;//instead of throwing exceptions
             }
 
             return tokens;
