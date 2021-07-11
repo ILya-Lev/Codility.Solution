@@ -17,7 +17,7 @@ namespace LeetCode.Tasks
 
             var pattern = new string(SimplifyPattern(p).ToArray());
 
-            return IsMatch(s, 0, p, 0);
+            return IsMatch(s, 0, pattern, 0);
         }
 
         private IEnumerable<char> SimplifyPattern(string p)
@@ -35,44 +35,42 @@ namespace LeetCode.Tasks
                 yield return p[i];
             }
 
-            if (p[^2] == p[^1] && p[^1] == AnySequence)
-                yield break;
-
             yield return p[^1];
         }
 
-        private bool IsMatch(string s, int sIdx, string p, int pIdx)
+        //private bool IsMatch(string s, int sHead, int sTail, string p, int pHead, int pTail)
+        private bool IsMatch(string s, int sHead, string p, int pHead)
         {
             #region recursion root
-            if (sIdx >= s.Length)
+            if (sHead >= s.Length)
             {
-                return pIdx >= p.Length || p.ToCharArray().Skip(pIdx).All(c => c == AnySequence);
+                return pHead >= p.Length || p.ToCharArray().Skip(pHead).All(c => c == AnySequence);
             }
 
-            if (pIdx >= p.Length)
+            if (pHead >= p.Length)
             {
-                return sIdx >= s.Length || p[^1] == AnySequence;
+                return sHead >= s.Length || p[^1] == AnySequence;
             }
             #endregion recursion root
 
-            if (p[pIdx] == AnySingle)
-                return IsMatch(s, sIdx + 1, p, pIdx + 1);
+            if (p[pHead] == AnySingle)
+                return IsMatch(s, sHead + 1, p, pHead + 1);
 
-            if (p[pIdx] == AnySequence)
+            if (p[pHead] == AnySequence)
             {
-                for (int i = 0; i < s.Length - sIdx; i++)//or < s.length-sIdx-non-*-p after pIdx
+                for (int i = 0; i < s.Length - sHead; i++)//or < s.length-sHead-non-*-p after pHead
                 {
-                    if (IsMatch(s, sIdx + i, p, pIdx + 1))
+                    if (IsMatch(s, sHead + i, p, pHead + 1))
                         return true;
                 }
 
                 return false;
             }
 
-            if (p[pIdx] != s[sIdx])
+            if (p[pHead] != s[sHead])
                 return false;
 
-            return IsMatch(s, sIdx + 1, p, pIdx + 1);
+            return IsMatch(s, sHead + 1, p, pHead + 1);
         }
     }
 }
