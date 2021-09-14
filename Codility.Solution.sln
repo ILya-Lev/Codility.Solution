@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.29411.138
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31612.314
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Codility.Solvers", "Codility.Solvers\Codility.Solvers.csproj", "{B800BD30-2BD2-4FCD-BA2F-32F00BC38C34}"
 EndProject
@@ -13,9 +13,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LuxoftPolandContest.Tests",
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Luxoft.GeneralCsTest", "Luxoft.GeneralCsTest\Luxoft.GeneralCsTest.csproj", "{D42CB5D5-A615-4A24-ACCF-A2E8A9FADDDE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LeetCode.Tasks", "LeetCode.Tasks\LeetCode.Tasks.csproj", "{DF3EC2CD-A8CC-4167-A3D0-CA3CBCE16275}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LeetCode.Tasks", "LeetCode.Tasks\LeetCode.Tasks.csproj", "{DF3EC2CD-A8CC-4167-A3D0-CA3CBCE16275}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LeetCode.Tests", "LeetCode.Tests\LeetCode.Tests.csproj", "{ABADEAEC-E991-41E5-AF04-A83C584198DA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LeetCode.Tests", "LeetCode.Tests\LeetCode.Tests.csproj", "{ABADEAEC-E991-41E5-AF04-A83C584198DA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Facebook.Problems", "Facebook.Problems\Facebook.Problems.csproj", "{0F698016-CA3B-4D64-B973-7CC94FEF2B39}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Facebook.Tests", "Facebook.Tests\Facebook.Tests.csproj", "{FF12B147-51EC-4E35-90C7-3E698F6E8E96}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -51,6 +55,14 @@ Global
 		{ABADEAEC-E991-41E5-AF04-A83C584198DA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{ABADEAEC-E991-41E5-AF04-A83C584198DA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{ABADEAEC-E991-41E5-AF04-A83C584198DA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0F698016-CA3B-4D64-B973-7CC94FEF2B39}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0F698016-CA3B-4D64-B973-7CC94FEF2B39}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0F698016-CA3B-4D64-B973-7CC94FEF2B39}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0F698016-CA3B-4D64-B973-7CC94FEF2B39}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FF12B147-51EC-4E35-90C7-3E698F6E8E96}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FF12B147-51EC-4E35-90C7-3E698F6E8E96}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FF12B147-51EC-4E35-90C7-3E698F6E8E96}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FF12B147-51EC-4E35-90C7-3E698F6E8E96}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
