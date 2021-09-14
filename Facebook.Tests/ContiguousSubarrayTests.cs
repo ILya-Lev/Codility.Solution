@@ -1,4 +1,6 @@
-﻿using System.Linq;
+﻿using System;
+using System.Diagnostics;
+using System.Linq;
 using Facebook.Problems;
 using FluentAssertions;
 using Xunit;
@@ -26,10 +28,45 @@ namespace Facebook.Tests
         [Fact]
         public void CountSubarrays_ReverseNaturalNumbers_TheSame()
         {
-            var numbers = Enumerable.Range(1, 10_000).Reverse().ToArray();
+            var numbers = Enumerable.Range(1, 1_000_000).Reverse().ToArray();
             
             ContiguousSubarray.CountSubarrays(numbers)
                 .Should().Equal(numbers);
+        }
+
+        [Fact]
+        public void CountSubarrays_Random_CompareTheTwoSolutions()
+        {
+            var numbers = Enumerable.Range(1, 10_000).ToArray();
+            Shuffle(numbers);
+
+            var watchFast = Stopwatch.StartNew();
+            var fast = ContiguousSubarray.CountSubarrays(numbers);
+            watchFast.Stop();
+
+            var watchSlow = Stopwatch.StartNew();
+            var slow = ContiguousSubarray1.CountSubarrays(numbers);
+            watchSlow.Stop();
+
+            slow.Should().BeEquivalentTo(fast);
+            watchSlow.ElapsedMilliseconds.Should().BeLessOrEqualTo(watchFast.ElapsedMilliseconds);
+        }
+
+        private void Shuffle(int[] numbers)
+        {
+            var generator = new Random(DateTime.UtcNow.Millisecond);
+            for (int i = 0; i < numbers.Length; i++)
+            {
+                var lhs = generator.Next(0, numbers.Length);
+                var rhs = generator.Next(0, numbers.Length);
+                Swap(numbers, lhs, rhs);
+            }
+
+            //interesting swap via deconstruction.....
+            static void Swap(int[] array, int indexLhs, int indexRhs)
+            {
+                (array[indexLhs], array[indexRhs]) = (array[indexRhs], array[indexLhs]);
+            }
         }
     }
 }
