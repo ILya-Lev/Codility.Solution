@@ -22,7 +22,7 @@ namespace Facebook.Problems
             {
                 case 0: return HasDuplicates(s) ? s.Length : s.Length - 2;    //O(N)
                 case 1: return HasDuplicates(s) ? s.Length - 1 : s.Length - 2;//O(N)
-                default:                                                      // time:O(N^2) memory: O(N)
+                default:                                                      // 
                     var matchingInitially = s.Length - differences.Count;
                     var matchingAfterSwap = TheBestSwapEffect(s, t, differences);//in {0,1,2};
                     return matchingInitially + matchingAfterSwap;
@@ -53,7 +53,35 @@ namespace Facebook.Problems
             return false;
         }
 
+        //O(N) time and O(N) space
         private static int TheBestSwapEffect(string s, string t, IReadOnlyList<int> differences)
+        {
+            var tDiffPopulation = new Dictionary<char, int>();
+            foreach (var diff in differences)
+            {
+                if (!tDiffPopulation.ContainsKey(t[diff]))
+                    tDiffPopulation.Add(t[diff], 0);
+                tDiffPopulation[t[diff]]++;
+            }
+
+            var positiveEffect = 0;
+            foreach (var diff in differences)
+            {
+                if (tDiffPopulation.TryGetValue(s[diff], out var population))
+                {
+                    if (population > 0)
+                        positiveEffect++;
+                    tDiffPopulation[s[diff]]--;
+                }
+
+                if (positiveEffect == 2) return 2;
+            }
+
+            return positiveEffect;
+        }
+
+        //O(N^2) time; O(1) space
+        private static int TheBestSwapEffectNaive(string s, string t, IReadOnlyList<int> differences)
         {
             var matching = 0;
 
