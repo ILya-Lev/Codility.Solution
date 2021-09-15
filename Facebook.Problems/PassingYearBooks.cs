@@ -19,6 +19,9 @@ namespace Facebook.Problems
 
         public static int[] FindSignatureCounts(int[] arr)
         {
+            //memory: O(N), time: O(N^2)
+            //straightforward solution
+
             var booksToMove = Enumerable.Range(1, arr.Length).Select(owner => new Book(owner)).ToList();//ideally linked list
             var completelySignedBooks = new List<Book>(arr.Length);
 
