@@ -21,7 +21,7 @@ namespace Facebook.Problems
         {
             // Write your code here
             var notMatched = new Stack<char>();
-            foreach (var c in s)
+            foreach (var c in s)                        //time: O(s.Length); memory: O(s.Length)
             {
                 if (_openingBrackets.Contains(c))
                 {
