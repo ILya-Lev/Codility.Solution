@@ -17,9 +17,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LeetCode.Tasks", "LeetCode.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LeetCode.Tests", "LeetCode.Tests\LeetCode.Tests.csproj", "{ABADEAEC-E991-41E5-AF04-A83C584198DA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Facebook.Problems", "Facebook.Problems\Facebook.Problems.csproj", "{0F698016-CA3B-4D64-B973-7CC94FEF2B39}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Facebook.Problems", "Facebook.Problems\Facebook.Problems.csproj", "{0F698016-CA3B-4D64-B973-7CC94FEF2B39}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Facebook.Tests", "Facebook.Tests\Facebook.Tests.csproj", "{FF12B147-51EC-4E35-90C7-3E698F6E8E96}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Facebook.Tests", "Facebook.Tests\Facebook.Tests.csproj", "{FF12B147-51EC-4E35-90C7-3E698F6E8E96}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Algorithms.Solutions", "Algorithms.Solutions\Algorithms.Solutions.csproj", "{33F2EBB8-F897-4992-9C22-519EDC8E0E68}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Algorithms.Tests", "Algorithms.Tests\Algorithms.Tests.csproj", "{E13993A8-01FD-4F1A-BF37-4C9C84376F91}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -63,6 +67,14 @@ Global
 		{FF12B147-51EC-4E35-90C7-3E698F6E8E96}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FF12B147-51EC-4E35-90C7-3E698F6E8E96}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FF12B147-51EC-4E35-90C7-3E698F6E8E96}.Release|Any CPU.Build.0 = Release|Any CPU
+		{33F2EBB8-F897-4992-9C22-519EDC8E0E68}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{33F2EBB8-F897-4992-9C22-519EDC8E0E68}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{33F2EBB8-F897-4992-9C22-519EDC8E0E68}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{33F2EBB8-F897-4992-9C22-519EDC8E0E68}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E13993A8-01FD-4F1A-BF37-4C9C84376F91}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E13993A8-01FD-4F1A-BF37-4C9C84376F91}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E13993A8-01FD-4F1A-BF37-4C9C84376F91}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E13993A8-01FD-4F1A-BF37-4C9C84376F91}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
