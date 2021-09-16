@@ -23,6 +23,11 @@ namespace Facebook.Tests
             };
 
             NodesInSubtree.CountOfNodes(root, queries, null).Should().Equal(new[] { 2 });
+            
+            var constructed = NodesInSubtree.ConstructTree("aba");
+            constructed.Should().BeEquivalentTo(root);
         }
+
+
     }
 }

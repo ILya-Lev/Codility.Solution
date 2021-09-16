@@ -19,6 +19,30 @@ namespace Facebook.Problems
             public char C { get; set; }
         }
 
+        public static Node ConstructTree(string s)
+        {
+            var root = new Node() {U = 1};
+            var index = 2;
+
+            var level = new Queue<Node>();
+            level.Enqueue(root);
+            while (index <= s.Length)
+            {
+                var current = level.Dequeue();
+                
+                current.Left = new Node() { U = index++ };
+                level.Enqueue(current.Left);
+
+                if (index <= s.Length)
+                {
+                    current.Right = new Node() { U = index++ };
+                    level.Enqueue(current.Right);
+                }
+            }
+
+            return root;
+        }
+
         public static int[] CountOfNodes(Node root, List<Query> queries, String s)
         {
             var subtreePopulation = new Dictionary<int, int>();
