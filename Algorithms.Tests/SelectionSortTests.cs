@@ -1,7 +1,7 @@
-using System;
-using System.Linq;
 using Algorithms.Solutions;
 using FluentAssertions;
+using System;
+using System.Linq;
 using Xunit;
 
 namespace Algorithms.Tests
@@ -22,7 +22,15 @@ namespace Algorithms.Tests
         {
             var reversed = Enumerable.Range(1, 10_000).Reverse().ToArray();
 
-            HeapSort<int>.Sort(reversed).Should().BeInAscendingOrder();
+            HeapSort<int>.SortAscending(reversed).Should().BeInAscendingOrder();
+        }
+
+        [Fact]
+        public void HeapSort_Ascending_Descending()
+        {
+            var reversed = Enumerable.Range(1, 10_000).ToArray();
+
+            HeapSort<int>.SortDescending(reversed).Should().BeInDescendingOrder();
         }
     }
 }

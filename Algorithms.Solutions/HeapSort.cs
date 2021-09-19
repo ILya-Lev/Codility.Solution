@@ -8,7 +8,7 @@ namespace Algorithms.Solutions
     /// </summary>
     public class HeapSort<T> where T : IComparable<T>
     {
-        public static T[] Sort(T[] sequence)
+        public static T[] SortAscending(T[] sequence)
         {
             var ascending = new T[sequence.Length];
             
@@ -20,14 +20,19 @@ namespace Algorithms.Solutions
 
             return ascending;
         }
-    }
 
-    /// <summary>
-    /// use heap low and heap high, half of items in low, another half in high one
-    /// </summary>
-    public class MedianMaintanence
-    {
+        public static T[] SortDescending(T[] sequence)
+        {
+            var descending = new T[sequence.Length];
+            
+            var minHeap = MaxHeap<T>.Heapify(sequence);
+            for (int i = 0; i < descending.Length && minHeap.Count > 0; i++)
+            {
+                descending[i] = minHeap.Extract();
+            }
 
+            return descending;
+        }
     }
 
     /// <summary>

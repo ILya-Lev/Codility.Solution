@@ -36,18 +36,7 @@ namespace Algorithms.Solutions
         {
             _storage.Add(item);
 
-            //bubble-up
-            var current = _storage.Count - 1;
-            var parent = GetParentIndex(current);
-            while (IsValidParent() && DoesBreakHeapProperty(parent, current))
-            {
-                Swap(parent, current);
-
-                current = parent;
-                parent = GetParentIndex(current);
-            }
-
-            bool IsValidParent() => parent >= 0;
+            BubbleUp();
         }
 
         /// <summary>
@@ -76,8 +65,7 @@ namespace Algorithms.Solutions
         /// heap property has to be restored for higher nodes only
         /// i.e. starting with the parent of the very last element of the input sequence
         ///
-        /// time complexity O(N) as we go over N/2 parent nodes from bottom to top
-        /// and on each node compare parent with at most 2 of its child nodes (which is constant)
+        /// time complexity O(N) asymptotically as  sum(k/2^(k+1)) = 2
         ///
         /// inspired by dotnet 6 RC implementation of priority queue (finally we have it in C#)
         /// https://github.com/dotnet/runtime/blob/360df71eadde0d1394ee7b89693f83913f75575d/src/libraries/System.Collections/src/System/Collections/Generic/PriorityQueue.cs#L591
@@ -98,6 +86,22 @@ namespace Algorithms.Solutions
         private static int GetLeftChildIndex(int current) => (current + 1) * 2 - 1;
         private static int GetRightChildIndex(int current) => (current + 1) * 2;
         
+        private void BubbleUp()
+        {
+            var current = _storage.Count - 1;
+            var parent = GetParentIndex(current);
+            while (IsValidParent() && DoesBreakHeapProperty(parent, current))
+            {
+                Swap(parent, current);
+
+                current = parent;
+                parent = GetParentIndex(current);
+            }
+         
+            bool IsValidParent() => parent >= 0;
+        }
+
+
         private void BubbleDown(int parent)
         {
             var left = GetLeftChildIndex(parent);
