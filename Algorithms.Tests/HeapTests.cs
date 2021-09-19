@@ -44,6 +44,16 @@ namespace Algorithms.Tests
         }
 
         [Fact]
+        public void MinHeapify_Descending_CheckStorage()
+        {
+            var sequence = Enumerable.Range(1, 10).Reverse().ToArray();
+            var heap = MinHeap<int>.Heapify(sequence);
+
+            heap.Count.Should().Be(sequence.Length);
+            heap.Items.Should().Equal(new[] { 1,2,4,3,6,5,8,10,7,9 });
+        }
+
+        [Fact]
         public void Extract_WhenHave9Items_CheckStorage()
         {
             var sequence = new[] { 4, 4, 8, 9, 4, 12, 9, 11, 13 };

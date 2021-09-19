@@ -62,28 +62,7 @@ namespace Algorithms.Solutions
             Swap(0, Count - 1);
             _storage.RemoveAt(_storage.Count - 1);
 
-            //bubble-down
-            var parent = 0;
-            var left = GetLeftChildIndex(parent);
-            var right = GetRightChildIndex(parent);
-
-            while ((IsValidChildren(left) && DoesBreakHeapProperty(parent, left))
-                || (IsValidChildren(right) && DoesBreakHeapProperty(parent, right)))
-            {
-                if (!IsValidChildren(right))          //as right is after left, current left is the latest
-                {
-                    Swap(left, parent);  //last possible move
-                    continue;
-                }
-
-                var furthestChild = GetFurthestChild(left, right);
-
-                Swap(parent, furthestChild);
-
-                parent = furthestChild;
-                left = GetLeftChildIndex(parent);
-                right = GetRightChildIndex(parent);
-            }
+            BubbleDown(0);
 
             return head;
         }
@@ -109,32 +88,40 @@ namespace Algorithms.Solutions
 
             for (int parent = GetParentIndex(_storage.Count - 1); parent >= 0; parent--)
             {
-                var left = GetLeftChildIndex(parent);
-                var right = GetRightChildIndex(parent);
-
-                if ((IsValidChildren(left) && DoesBreakHeapProperty(parent, left))
-                    || (IsValidChildren(right) && DoesBreakHeapProperty(parent, right)))
-                {
-                    if (!IsValidChildren(right)) //as right is after left, current left is the latest
-                    {
-                        Swap(left, parent); //last possible move
-                        continue;
-                    }
-
-                    var furthestChild = GetFurthestChild(left, right);
-
-                    Swap(parent, furthestChild);
-                }
+                BubbleDown(parent);
             }
 
             return this;
         }
-
+        
         private static int GetParentIndex(int current) => (current + 1) / 2 - 1;
         private static int GetLeftChildIndex(int current) => (current + 1) * 2 - 1;
         private static int GetRightChildIndex(int current) => (current + 1) * 2;
+        
+        private void BubbleDown(int parent)
+        {
+            var left = GetLeftChildIndex(parent);
+            var right = GetRightChildIndex(parent);
 
+            while ((IsValidChildren(left) && DoesBreakHeapProperty(parent, left))
+                   || (IsValidChildren(right) && DoesBreakHeapProperty(parent, right)))
+            {
+                if (!IsValidChildren(right)) //as right is after left, current left is the latest
+                {
+                    Swap(left, parent); //last possible move
+                    continue;
+                }
 
+                var furthestChild = GetFurthestChild(left, right);
+
+                Swap(parent, furthestChild);
+
+                parent = furthestChild;
+                left = GetLeftChildIndex(parent);
+                right = GetRightChildIndex(parent);
+            }
+        }
+        
         private bool IsValidChildren(int children) => children < _storage.Count;
         
         private void Swap(int parent, int current) =>
