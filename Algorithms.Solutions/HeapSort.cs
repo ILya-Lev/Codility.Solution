@@ -34,12 +34,4 @@ namespace Algorithms.Solutions
             return descending;
         }
     }
-
-    /// <summary>
-    /// min path (by length of each edge) between the two given nodes
-    /// </summary>
-    public class DijkstraShortestPath
-    {
-
-    }
 }

@@ -105,7 +105,7 @@ namespace Codility.Tests
                 collection.Add(n);
             }
 
-            collection.Should().Equal(input.OrderBy(n => n));
+            collection.Should().Equal(input.Select(n => (double)n).OrderBy(n => n));
             collection.Should().BeInAscendingOrder();
         }
 
@@ -124,7 +124,7 @@ namespace Codility.Tests
                 collection.Add(n);
             }
 
-            collection.Should().Equal(input.OrderByDescending(n => n));
+            collection.Should().Equal(input.Select(n => (double)n).OrderByDescending(n => n));
             collection.Should().BeInDescendingOrder();
         }
 
