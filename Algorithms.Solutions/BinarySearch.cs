@@ -13,9 +13,9 @@ namespace Algorithms.Solutions
         /// <returns>index it which <see cref="key"/> is found
         /// or negative value, if ~ operation is applied to it, gives a position where missing
         /// key should be inserted to maintain ascending sorted order</returns>
-        public static int Find(IReadOnlyList<T> source, T key)
+        public static int Find(IReadOnlyList<T> source, T key, int from = 0)
         {
-            int start = 0, end = source.Count-1;
+            int start = from, end = source.Count-1;
 
             var challengeStart = source[start].CompareTo(key);
             if (challengeStart > 0) return ~start;
