@@ -7,6 +7,7 @@
             var milestoneDays = new int[milestones.Length];
             var milestoneIndex = 0;
 
+            //runtime at most O(r.Len + m.Len); space O(m.Len)
             var totalRevenue = 0;
             for (int day = 0; day < revenues.Length && milestoneIndex < milestones.Length; day++)
             {
