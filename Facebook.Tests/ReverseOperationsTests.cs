@@ -17,7 +17,7 @@ namespace Facebook.Tests
         {
             var direct = ReverseOperations.FromArray(input);
 
-            var reversed = ReverseOperations.Reverse(direct);
+            var reversed = ReverseOperations.ReverseNew(direct);
 
             var final = ReverseOperations.ToSequence(reversed).ToArray();
             final.Should().Equal(expected);

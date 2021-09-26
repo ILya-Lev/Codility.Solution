@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Facebook.Problems
 {
@@ -72,6 +73,50 @@ namespace Facebook.Problems
 
                 previous.Next = next;
                 current = next;
+            }
+
+            return head;
+        }
+
+        public static Node ReverseNew(Node head)
+        {
+            Node current = head, previous = null;
+            
+            while (current != null)
+            {
+                //move on
+                if (current.Data % 2 != 0)
+                {
+                    previous = current;
+                    current = current.Next;
+                    continue;
+                }
+
+                //collect even part and reverse its internals
+                var start = previous;
+                var subhead = current;
+                while (current.Next != null && current.Next.Data % 2 == 0)
+                {
+                    var next = current.Next;
+                    current.Next = previous;
+                    previous = current;
+                    current = next;
+                }
+
+                //complete reversal/rotation of even part
+                var tmp = current.Next;
+                current.Next = previous;
+                subhead.Next = tmp;
+                if (start != null)
+                {
+                    start.Next = current;
+                }
+                else
+                {
+                    head = current;
+                }
+
+                current = tmp;
             }
 
             return head;
