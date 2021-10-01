@@ -17,5 +17,16 @@ namespace Algorithms.Tests
         {
             JosephusPermutation.ConstructQueue(7, 3).Should().Equal(new[] { 3, 6, 2, 7, 5, 1, 4 });
         }
+
+        [Theory]
+        [InlineData(7,3)]
+        [InlineData(7,7)]
+        [InlineData(7,1)]
+        [InlineData(10,3)]
+        [InlineData(10,5)]
+        public void Construct_QueueVsMath_Match(int n, int m)
+        {
+            JosephusPermutation.Construct(n, m).Should().Equal(JosephusPermutation.ConstructQueue(n, m));
+        }
     }
 }
