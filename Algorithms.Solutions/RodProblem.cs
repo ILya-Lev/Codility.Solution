@@ -39,7 +39,7 @@ namespace Algorithms.Solutions
 
             foreach (var (L, price) in _priceByLength)
             {
-                if (length < L) continue;
+                if (length < L || L == 0) continue;
 
                 pieces.Add((L, length / L, length / L * price));
                 length %= L;
