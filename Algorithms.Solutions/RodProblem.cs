@@ -27,6 +27,7 @@ namespace Algorithms.Solutions
 
             _priceByLength = prices
                 .OrderByDescending(p => p.Value * 1.0 / p.Key)
+                .Concat(new[] { new KeyValuePair<int, int>(0, 0) })
                 .ToDictionary(p => p.Key, p => p.Value);
         }
 
@@ -53,6 +54,28 @@ namespace Algorithms.Solutions
             return pieces.ToArray();
         }
 
+        public int CalculateMaxPrice(int length)
+        {
+            var maxPrices = new Dictionary<int, int>() { { 0, 0 } };
+            for (int i = 1; i <= length; i++)
+            {
+                var maxPrice = -1;
+                for (int j = 1; j <= i; j++)
+                {
+                    var currentPrice = GetPriceForChop(_priceByLength, j);
+                    var remainingPrice = GetPriceForChop(maxPrices, i - j);
+                    maxPrice = Math.Max(maxPrice, currentPrice + remainingPrice);
+                }
+                maxPrices.Add(i, maxPrice);
+            }
+
+            return maxPrices[length];
+
+            int GetPriceForChop(IReadOnlyDictionary<int, int> map, int len) => map.TryGetValue(len, out var p)
+                ? p
+                : 0;
+        }
+
         public Cut CutDynamic(int length)
         {
             var bestCut = new Cut();
@@ -62,7 +85,7 @@ namespace Algorithms.Solutions
                 bestCut.AmountByLength.Add(length, 1);
             }
 
-            for (int i = 1; i <= length/2; i++)
+            for (int i = 1; i <= length / 2; i++)
             {
                 var lhsCut = DoCut(i);
                 var rhsCut = DoCut(length - i);

@@ -57,5 +57,25 @@ namespace Algorithms.Tests
 
             cut.TotalPrice.Should().Be(total);
         }
+
+        [Theory]
+        [InlineData(01, 1)]
+        [InlineData(02, 5)]
+        [InlineData(03, 8)]
+        [InlineData(04, 10)]
+        [InlineData(05, 13)]
+        [InlineData(06, 17)]
+        [InlineData(07, 18)]
+        [InlineData(08, 22)]
+        [InlineData(09, 25)]
+        [InlineData(10, 30)]
+        [InlineData(40, 120)]
+        [InlineData(41, 121)]
+        [InlineData(100, 300)]
+        public void CalculateMaxPrice_Sample_Observe(int length, int total)
+        {
+            var price = new RodProblem(null).CalculateMaxPrice(length);
+            price.Should().Be(total);
+        }
     }
 }
