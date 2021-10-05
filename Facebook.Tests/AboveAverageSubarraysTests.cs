@@ -1,6 +1,7 @@
 ﻿using Facebook.Problems;
 using FluentAssertions;
 using FluentAssertions.Execution;
+using System.Linq;
 using Xunit;
 
 namespace Facebook.Tests
@@ -22,6 +23,15 @@ namespace Facebook.Tests
 
             subarrays[2].L.Should().Be(1);
             subarrays[2].R.Should().Be(1);
+        }
+
+        [Fact]//when hash set is used N^2 otherwise 2^N !!!!!
+        public void FindAboveAverageSubarrays_Stress_Fast()
+        {
+            var numbers = Enumerable.Range(1, 1_000).ToArray();
+            var subarrays = AboveAverageSubarrays.FindAboveAverageSubarrays(numbers);
+
+            subarrays.Length.Should().BeGreaterOrEqualTo(100);
         }
     }
 }
