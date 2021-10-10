@@ -8,6 +8,7 @@ namespace Algorithms.Solutions
     {
         private readonly IReadOnlyDictionary<int, int> _priceByLength;
         private readonly Dictionary<int, Cut> _cutCache = new Dictionary<int, Cut>();
+        private readonly Dictionary<int, int> _seen = new();
 
         public RodProblem(IReadOnlyDictionary<int, int> priceByLength)
         {
@@ -97,6 +98,25 @@ namespace Algorithms.Solutions
             }
 
             return bestCut;
+        }
+
+        public int FindCut(int length, int cutCost) => DoCut(length, cutCost);
+
+        private int DoCut(int length, int cutCost)
+        {
+            if (_seen.TryGetValue(length, out var price))
+                return price;
+
+            //price without cut
+            price = _priceByLength.TryGetValue(length, out var p) ? p : -cutCost;
+
+            for (int part = 1; part < length; part++)
+            {
+                price = Math.Max(price, DoCut(part, cutCost) + DoCut(length - part, cutCost) - cutCost);
+            }
+
+            _seen.Add(length, price);
+            return price;
         }
 
         private Cut DoCut(int length)
