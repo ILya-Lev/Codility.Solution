@@ -8,7 +8,6 @@ public class Maze
     private readonly int _width;
     private readonly MazeLocation _start;
     private readonly MazeLocation _finish;
-    private readonly double _sparseness;
 
     private readonly Cell[,] _grid;
 
@@ -18,7 +17,6 @@ public class Maze
         _width = width;
         _start = start;
         _finish = finish;
-        _sparseness = sparseness;
 
         _grid = new Cell[height,width];
         FillInGrid(sparseness);
@@ -40,6 +38,22 @@ public class Maze
             .Where(location => location.IsValid(_height, _width))
             .Where(location => _grid[location.Row, location.Column] != Cell.Blocked)
             .ToArray();
+    }
+
+    public double GetEuclideanDistanceToGoal(MazeLocation currentLocation)
+    {
+        var dx = currentLocation.Column - _finish.Column;
+        var dy = currentLocation.Row - _finish.Row;
+
+        return Math.Sqrt(dx * dx + dy * dy);
+    }
+
+    public double GetManhattanDistanceToGoal(MazeLocation currentLocation)
+    {
+        var dx = currentLocation.Column - _finish.Column;
+        var dy = currentLocation.Row - _finish.Row;
+
+        return Math.Abs(dx) + Math.Abs(dy);
     }
 
     public void MarkPath(IReadOnlyCollection<MazeLocation> path)
@@ -140,61 +154,5 @@ public class Maze
             return Row >= 0 && Row < height
                 && Column >= 0 && Column < width;
         }
-    }
-
-    public class Node<T> : IComparable<Node<T>>
-    {
-        private readonly T _state;
-        private readonly Node<T>? _parent;
-        private readonly double _cost;
-        private readonly double _heuristic;
-
-        public Node(T state, Node<T>? parent, double cost = 0, double heuristic = 0)
-        {
-            _state = state;
-            _parent = parent;
-            _cost = cost;
-            _heuristic = heuristic;
-        }
-
-        public int CompareTo(Node<T>? other) => (_cost + _heuristic).CompareTo(other._cost + other._heuristic);
-
-        public static IReadOnlyCollection<T> AsPath(Node<T> end)
-        {
-            var path = new List<T>();
-            
-            for (var current = end; current != null; current = current._parent)
-                path.Add(current._state);
-
-            path.Reverse();
-
-            return path;
-        }
-
-        public static Node<T>? DepthFirstSearch(T initial, Func<T, bool> isInGoal, Func<T, IReadOnlyCollection<T>> successors)
-        {
-            var frontier = new Stack<Node<T>>();
-            frontier.Push(new Node<T>(initial, null));
-        
-            var explored = new HashSet<T>();
-            explored.Add(initial);
-
-            while (frontier.Any())
-            {
-                var current = frontier.Pop();
-                if (isInGoal(current._state))
-                    return current;
-
-                var possibilities = successors(current._state).Where(t => !explored.Contains(t)).ToArray();
-                foreach (var possibility in possibilities)
-                {
-                    explored.Add(possibility);
-                    frontier.Push(new Node<T>(possibility, current));
-                }
-            }
-
-            return null;//there is no path
-        }
-
     }
 }
