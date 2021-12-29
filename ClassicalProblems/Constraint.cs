@@ -373,7 +373,7 @@ public class WordGrid
         {
             var allLocations = assignment.Values.SelectMany(v => v).ToArray();
             var allUniqueLocations = new HashSet<GridLocation>(allLocations);
-            
+
             //if we have duplicates
             return allLocations.Length == allUniqueLocations.Count;
         }
@@ -401,7 +401,7 @@ public class SendMoreMoneyConstraint : Constraint<char, int>
         var o = assignment['O'];
         var r = assignment['R'];
         var y = assignment['Y'];
-        
+
         var send = s * 1_000 + e * 100 + n * 10 + d;
         var more = m * 1_000 + o * 100 + r * 10 + e;
         var money = m * 10_000 + o * 1_000 + n * 100 + e * 10 + y;
@@ -416,3 +416,179 @@ public class SendMoreMoneyConstraint : Constraint<char, int>
         return new HashSet<int>(assignment.Values).Count == assignment.Count;
     }
 }
+
+public class RectangleFill
+{
+    private readonly int _height;
+    private readonly int _width;
+    private readonly Rectangle _masterRectangle;
+    private readonly int[,] _grid;
+
+    public RectangleFill(int width, int height)
+    {
+        _height = height;
+        _width = width;
+        _masterRectangle = new Rectangle(width, height);
+
+        _grid = new int[height, width];
+    }
+
+    public Rectangle[] CoverWithRectangles(IReadOnlyCollection<Rectangle> rectangles)
+    {
+        IReadOnlyCollection<RectangleLocation> allLocations = Enumerable.Range(0, _height)
+            .SelectMany(row => Enumerable.Range(0, _width).Select(col => new RectangleLocation(row, col)))
+            .ToArray();
+
+        var domain = rectangles.ToDictionary(r => r, r => allLocations);
+        var csp = new ConstraintSatisfactoryProblem<Rectangle, RectangleLocation>(rectangles, domain);
+        csp.AddConstraint(new RectangleConstraint(rectangles, _masterRectangle));
+
+        var solution = csp.BacktrackingSearch();
+        var coverage = solution?.Select(p => new Rectangle(p.Key.Width, p.Key.Height) { TopLeft = p.Value }).ToArray();
+
+        if (coverage is not null)
+            MarkGrid(coverage);
+
+        return coverage;
+    }
+
+    private void MarkGrid(IReadOnlyCollection<Rectangle> coverage)
+    {
+        for (int row = 0; row < _height; row++)
+            for (int col = 0; col < _width; col++)
+            {
+                foreach (var rectangle in coverage)
+                {
+                    if (rectangle.Contains(row, col))
+                        _grid[row, col] = rectangle.Id;
+                }
+            }
+    }
+
+    public override string ToString()
+    {
+        var sb = new StringBuilder();
+        for (int row = 0; row < _height; row++)
+        {
+            for (int col = 0; col < _width; col++)
+            {
+                if (_grid[row, col] != 0)
+                    sb.Append($"{_grid[row, col]}");
+                else
+                    sb.Append(" ");
+            }
+
+            sb.AppendLine();
+        }
+
+        return sb.ToString();
+    }
+
+    //for each rectangle we want to know Bottom Left position
+    public class RectangleConstraint : Constraint<Rectangle, RectangleLocation>
+    {
+        private readonly IReadOnlyCollection<Rectangle> _rectangles;
+        private readonly Rectangle _masterRectangle;
+
+        public RectangleConstraint(IReadOnlyCollection<Rectangle> rectangles, Rectangle masterRectangle)
+        : base(rectangles)
+        {
+            _rectangles = rectangles;
+            _masterRectangle = masterRectangle;
+        }
+
+        public override bool IsSatisfied(IReadOnlyDictionary<Rectangle, RectangleLocation> assignment)
+        {
+            return AllInsideMaster(assignment) && !AnyOverlaps(assignment);
+        }
+
+        //private bool ContainsAll(IReadOnlyDictionary<Rectangle, RectangleLocation> assignment)
+        //{
+        //    return _rectangles.All(assignment.ContainsKey);
+        //}
+
+        private bool AnyOverlaps(IReadOnlyDictionary<Rectangle, RectangleLocation> assignment)
+        {
+            var rectangleSet = _rectangles
+                .Where(assignment.ContainsKey)
+                .Select(r => new Rectangle(r.Width, r.Height) { TopLeft = assignment[r] })
+                .ToArray();
+            for (int i = 0; i < rectangleSet.Length; i++)
+                for (int j = i + 1; j < rectangleSet.Length; j++)
+                {
+                    if (rectangleSet[i].Overlaps(rectangleSet[j])
+                        || rectangleSet[i].Contains(rectangleSet[j])
+                        || rectangleSet[j].Contains(rectangleSet[i]))
+                        return true;
+                }
+
+            return false;
+        }
+
+        private bool AllInsideMaster(IReadOnlyDictionary<Rectangle, RectangleLocation> assignment)
+        {
+            foreach (var pair in assignment)
+            {
+                if (!_masterRectangle.Contains(pair.Value)
+                 || !_masterRectangle.Contains(pair.Key.GetBottomRightFor(pair.Value)))
+                    return false;
+            }
+
+            return true;
+        }
+    }
+
+    public class RectangleLocation
+    {
+        public int Row { get; }
+        public int Column { get; }
+
+        public RectangleLocation(int row, int col) => (Row, Column) = (row, col);
+        public void Deconstruct(out int row, out int column) => (row, column) = (Row, Column);
+
+        public static bool operator >=(RectangleLocation current, RectangleLocation other) =>
+            current.Row >= other.Row && current.Column >= other.Column;
+
+        public static bool operator <=(RectangleLocation current, RectangleLocation other) =>
+            current.Row <= other.Row && current.Column <= other.Column;
+
+        public override string ToString() => $"({Row},{Column})";
+    }
+
+    public class Rectangle
+    {
+        private static int _id = 0;
+        public int Id { get; } = _id++ % 10;
+
+        public RectangleLocation TopLeft { get; set; } = new (0, 0);
+        public RectangleLocation BottomRight => new (TopLeft.Row + Height - 1, TopLeft.Column + Width - 1);
+        public int Width { get; }
+        public int Height { get; }
+
+        public Rectangle(int height, int width) => (Height, Width) = (height, width);
+
+        public RectangleLocation GetBottomRightFor(RectangleLocation topLeft) =>
+            new (topLeft.Row + Height - 1, topLeft.Column + Width - 1);
+
+        public bool Contains(int row, int col) => Contains(new RectangleLocation(row, col));
+        public bool Contains(RectangleLocation location) => TopLeft <= location && BottomRight >= location;
+        public bool Contains(Rectangle other) => TopLeft <= other.TopLeft && BottomRight >= other.BottomRight;
+        public bool Overlaps(Rectangle other) => TopLeft <= other.BottomRight && BottomRight >= other.TopLeft;
+
+        protected bool Equals(Rectangle other)
+        {
+            return TopLeft.Equals(other.TopLeft) && Width == other.Width && Height == other.Height;
+        }
+
+        public override bool Equals(object? obj)
+        {
+            if (ReferenceEquals(null, obj)) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            if (obj.GetType() != this.GetType()) return false;
+            return Equals((Rectangle)obj);
+        }
+
+        public override int GetHashCode() => HashCode.Combine(TopLeft, Width, Height);
+    }
+}
+
