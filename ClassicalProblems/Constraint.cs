@@ -379,3 +379,40 @@ public class WordGrid
         }
     }
 }
+
+public class SendMoreMoneyConstraint : Constraint<char, int>
+{
+    private readonly char[] _letters;
+    public SendMoreMoneyConstraint(char[] letters) : base(letters) => _letters = letters;
+
+    public override bool IsSatisfied(IReadOnlyDictionary<char, int> assignment)
+    {
+        if (!AreDigitsUnique(assignment)) return false;
+
+        if (!AllVariablesAssigned(assignment)) return true; //give it a chance to move on
+
+        var m = assignment['M'];
+        if (m == 0) return false;
+
+        var s = assignment['S'];
+        var e = assignment['E'];
+        var n = assignment['N'];
+        var d = assignment['D'];
+        var o = assignment['O'];
+        var r = assignment['R'];
+        var y = assignment['Y'];
+        
+        var send = s * 1_000 + e * 100 + n * 10 + d;
+        var more = m * 1_000 + o * 100 + r * 10 + e;
+        var money = m * 10_000 + o * 1_000 + n * 100 + e * 10 + y;
+
+        return send + more == money;
+    }
+
+    private bool AllVariablesAssigned(IReadOnlyDictionary<char, int> assignment) => _letters.All(assignment.ContainsKey);
+
+    private bool AreDigitsUnique(IReadOnlyDictionary<char, int> assignment)
+    {
+        return new HashSet<int>(assignment.Values).Count == assignment.Count;
+    }
+}
