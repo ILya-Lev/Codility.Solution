@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using System.Windows.Markup;
 
 namespace ClassicalProblems;
 
@@ -592,3 +593,181 @@ public class RectangleFill
     }
 }
 
+//sudoku
+public class Sudoku
+{
+    public const int Size = 9;
+    private readonly int[,] _grid = new int[Size, Size];
+    public Sudoku(int[,] initialDigits)
+    {
+        for (int row = 0; row < Size; row++)
+        for (int col = 0; col < Size; col++)
+        {
+            _grid[row,col] = initialDigits[row,col];
+        }
+    }
+
+    public bool IsFilledIn()
+    {
+        for (int row = 0; row < Size; row++)
+        for (int col = 0; col < Size; col++)
+        {
+            if (_grid[row, col] == 0)
+                return false;
+        }
+
+        return true;
+    }
+
+    public void FillIn(Dictionary<(int row, int col), int> digitsByLocation)
+    {
+        foreach (var pair in digitsByLocation)
+        {
+            var (row,col) = pair.Key;
+            _grid[row, col] = pair.Value;
+        }
+    }
+    
+    public override string ToString()
+    {
+        var sb = new StringBuilder(Size * Size);
+        for (int row = 0; row < Size; row++)
+        {
+            for (int col = 0; col < Size; col++)
+                sb.Append($"{_grid[row, col]}");
+
+            sb.AppendLine();
+        }
+
+        return sb.ToString();
+    }
+
+    public class RowConstraint : Constraint<(int row, int col), int>
+    {
+        private readonly int _currentRow;
+        public RowConstraint(IReadOnlyCollection<(int row, int col)> cells, int currentRow) : base(cells)
+        {
+            _currentRow = currentRow;
+        }
+
+        public override bool IsSatisfied(IReadOnlyDictionary<(int row, int col), int> assignment)
+        {
+            var uniqueDigits = new HashSet<int>(Size);
+            for (int col = 0; col < Sudoku.Size; col++)
+            {
+                if (assignment.TryGetValue((_currentRow, col), out var digit) && digit != 0)
+                    uniqueDigits.Add(digit);
+            }
+
+            return uniqueDigits.Count == Size;
+        }
+    }
+
+    public class ColConstraint : Constraint<(int row, int col), int>
+    {
+        private readonly int _currentCol;
+        public ColConstraint(IReadOnlyCollection<(int row, int col)> cells, int currentCol) : base(cells)
+        {
+            _currentCol = currentCol;
+        }
+
+        public override bool IsSatisfied(IReadOnlyDictionary<(int row, int col), int> assignment)
+        {
+            var uniqueDigits = new HashSet<int>(Size);
+            for (int row = 0; row < Size; row++)
+            {
+                if (assignment.TryGetValue((row, _currentCol), out var digit) && digit != 0)
+                {
+                    uniqueDigits.Add(digit);
+                }
+            }
+
+            return uniqueDigits.Count == Size;
+        }
+    }
+
+    public class SquareConstraint : Constraint<(int row, int col), int>
+    {
+        private readonly int _id;
+        public SquareConstraint(IReadOnlyCollection<(int row, int col)> cells, int id) : base(cells)
+        {
+            _id = id;
+        }
+
+        public override bool IsSatisfied(IReadOnlyDictionary<(int row, int col), int> assignment)
+        {
+            var uniqueDigits = new HashSet<int>(Size);
+            for (int r = 0; r < Size/3; r++)
+            for (int c = 0; c < Size/3; c++)
+            {
+                var row = _id / 3 * 3 + r;
+                var col = _id % 3 * 3 + c;
+                if (assignment.TryGetValue((row, col), out var digit) && digit != 0)
+                {
+                    uniqueDigits.Add(digit);
+                }
+            }
+
+            return uniqueDigits.Count == Size;
+        }
+    }
+
+    public class SudokuConstraint : Constraint<(int row, int col), int>//domain = digits
+    {
+        public SudokuConstraint(IReadOnlyCollection<(int row, int col)> cells) : base(cells) {}
+
+        public override bool IsSatisfied(IReadOnlyDictionary<(int row, int col), int> assignment) => !assignment
+            .Any(p => DoesRowContainDuplicates(p.Key, p.Value, assignment)
+                   || DoesColContainDuplicates(p.Key, p.Value, assignment)
+                   || DoesSquareContainDuplicates(p.Key, p.Value, assignment));
+
+        private bool DoesRowContainDuplicates((int row, int col) cell, int digit
+            , IReadOnlyDictionary<(int row, int col), int> assignment)
+        {
+            for (int col = 0; col < Size; col++)
+            {
+                if (col == cell.col) continue;//do not compare the input cell with itself
+                
+                var key = (cell.row, col);
+                if (assignment.TryGetValue(key, out var currentDigit) && currentDigit == digit)
+                    return true;
+            }
+
+            return false;
+        }
+    
+        private bool DoesColContainDuplicates((int row, int col) cell, int digit
+            , IReadOnlyDictionary<(int row, int col), int> assignment)
+        {
+            for (int row = 0; row < Size; row++)
+            {
+                if (row == cell.row) continue;//do not compare the input cell with itself
+                
+                var key = (row, cell.col);
+                if (assignment.TryGetValue(key, out var currentDigit) && currentDigit == digit)
+                    return true;            }
+
+            return false;
+        }
+
+        private bool DoesSquareContainDuplicates((int row, int col) cell, int digit
+            , IReadOnlyDictionary<(int row, int col), int> assignment)
+        {
+            for (int r = 0; r < Size/3; r++)
+            for (int c = 0; c < Size/3; c++)
+            {
+                var aRow = cell.row / 3 * 3 + r;
+                var aCol = cell.col / 3 * 3 + c;
+
+                if (aRow == cell.row && aCol == cell.col)
+                    continue;//do not compare the input cell with itself
+
+                var key = (aRow, aCol);
+                if (assignment.TryGetValue(key, out var currentDigit) && currentDigit == digit)
+                    return true;
+            }
+
+            return false;
+        }
+    }
+}
