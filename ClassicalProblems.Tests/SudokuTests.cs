@@ -73,8 +73,8 @@ public class SudokuTests
         //for (int col = 0; col < Sudoku.Size; col++)
         //    solver.AddConstraint(new Sudoku.ColConstraint(variables.Where(p => p.c == col).ToArray(), col));
         //for (int id = 0; id < Sudoku.Size; id++)
-        //    solver.AddConstraint(new Sudoku.ColConstraint(variables.Where(p => p.r/3 + p.c%3 == id).ToArray(), id));
-        
+        //    solver.AddConstraint(new Sudoku.ColConstraint(variables.Where(p => p.r / 3 + p.c % 3 == id).ToArray(), id));
+
 
         var solution = solver.BacktrackingSearch();
         solution.Should().NotBeNull();

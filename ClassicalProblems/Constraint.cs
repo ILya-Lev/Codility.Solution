@@ -653,13 +653,17 @@ public class Sudoku
         public override bool IsSatisfied(IReadOnlyDictionary<(int row, int col), int> assignment)
         {
             var uniqueDigits = new HashSet<int>(Size);
+            var allDigits = new List<int>(Size);
             for (int col = 0; col < Sudoku.Size; col++)
             {
                 if (assignment.TryGetValue((_currentRow, col), out var digit) && digit != 0)
+                {
                     uniqueDigits.Add(digit);
+                    allDigits.Add(digit);
+                }
             }
 
-            return uniqueDigits.Count == Size;
+            return uniqueDigits.Count == allDigits.Count;
         }
     }
 
@@ -674,15 +678,17 @@ public class Sudoku
         public override bool IsSatisfied(IReadOnlyDictionary<(int row, int col), int> assignment)
         {
             var uniqueDigits = new HashSet<int>(Size);
+            var allDigits = new List<int>(Size);
             for (int row = 0; row < Size; row++)
             {
                 if (assignment.TryGetValue((row, _currentCol), out var digit) && digit != 0)
                 {
                     uniqueDigits.Add(digit);
+                    allDigits.Add(digit);
                 }
             }
 
-            return uniqueDigits.Count == Size;
+            return uniqueDigits.Count == allDigits.Count;
         }
     }
 
@@ -697,6 +703,7 @@ public class Sudoku
         public override bool IsSatisfied(IReadOnlyDictionary<(int row, int col), int> assignment)
         {
             var uniqueDigits = new HashSet<int>(Size);
+            var allDigits = new List<int>(Size);
             for (int r = 0; r < Size/3; r++)
             for (int c = 0; c < Size/3; c++)
             {
@@ -705,10 +712,11 @@ public class Sudoku
                 if (assignment.TryGetValue((row, col), out var digit) && digit != 0)
                 {
                     uniqueDigits.Add(digit);
+                    allDigits.Add(digit);
                 }
             }
 
-            return uniqueDigits.Count == Size;
+            return uniqueDigits.Count == allDigits.Count;
         }
     }
 
