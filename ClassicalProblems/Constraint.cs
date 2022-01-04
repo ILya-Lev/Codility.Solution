@@ -561,15 +561,15 @@ public class RectangleFill
         private static int _id = 0;
         public int Id { get; } = _id++ % 10;
 
-        public RectangleLocation TopLeft { get; set; } = new (0, 0);
-        public RectangleLocation BottomRight => new (TopLeft.Row + Height - 1, TopLeft.Column + Width - 1);
+        public RectangleLocation TopLeft { get; set; } = new(0, 0);
+        public RectangleLocation BottomRight => new(TopLeft.Row + Height - 1, TopLeft.Column + Width - 1);
         public int Width { get; }
         public int Height { get; }
 
         public Rectangle(int height, int width) => (Height, Width) = (height, width);
 
         public RectangleLocation GetBottomRightFor(RectangleLocation topLeft) =>
-            new (topLeft.Row + Height - 1, topLeft.Column + Width - 1);
+            new(topLeft.Row + Height - 1, topLeft.Column + Width - 1);
 
         public bool Contains(int row, int col) => Contains(new RectangleLocation(row, col));
         public bool Contains(RectangleLocation location) => TopLeft <= location && BottomRight >= location;
@@ -598,40 +598,34 @@ public class Sudoku
 {
     public const int Size = 9;
     private readonly int[,] _grid = new int[Size, Size];
+    private static readonly Dictionary<int, List<(int row, int col)>> _rowLocations = new();
+    private static readonly Dictionary<int, List<(int row, int col)>> _colLocations = new();
+    private static readonly Dictionary<int, List<(int row, int col)>> _squareLocations = new();
+
     public Sudoku(int[,] initialDigits)
     {
         for (int row = 0; row < Size; row++)
-        for (int col = 0; col < Size; col++)
-        {
-            _grid[row,col] = initialDigits[row,col];
-        }
+            for (int col = 0; col < Size; col++)
+            {
+                _grid[row, col] = initialDigits[row, col];
+            }
     }
 
     public IReadOnlyCollection<int> GetRange(int row, int col)
     {
-        if (_grid[row, col] != 0) return new []{_grid[row, col]};
+        if (_grid[row, col] != 0) return new[] { _grid[row, col] };
 
         var range = Enumerable.Range(1, Size).ToArray();
-        //go over row
-        for (int c = 0; c < Size; c++)
+
+        var locations = GetLocationsForRow(row)
+            .Concat(GetLocationsForCol(col))
+            .Concat(GetLocationsForSquare(GetSquareId(row, col)));
+
+        foreach ((int row, int col) location in locations)
         {
-            if (_grid[row, c] != 0)
-                range[_grid[row, c] - 1] = 0;
-        }
-        //go over col
-        for (int r = 0; r < Size; r++)
-        {
-            if (_grid[r, col] != 0)
-                range[_grid[r, col] - 1] = 0;
-        }
-        //go over square
-        for (int r = 0; r < Size/3; r++)
-        for (int c = 0; c < Size/3; c++)
-        {
-            var aRow = row / 3 * 3 + r;
-            var aCol = col / 3 * 3 + c;
-            if (_grid[aRow, aCol] != 0)
-                range[_grid[aRow, aCol] - 1] = 0;
+            var digit = _grid[location.row, location.col];
+            if (digit != 0)
+                range[digit - 1] = 0;
         }
 
         return range.Where(d => d != 0).ToArray();
@@ -640,11 +634,11 @@ public class Sudoku
     public bool IsFilledIn()
     {
         for (int row = 0; row < Size; row++)
-        for (int col = 0; col < Size; col++)
-        {
-            if (_grid[row, col] == 0)
-                return false;
-        }
+            for (int col = 0; col < Size; col++)
+            {
+                if (_grid[row, col] == 0)
+                    return false;
+            }
 
         return true;
     }
@@ -653,11 +647,11 @@ public class Sudoku
     {
         foreach (var pair in digitsByLocation)
         {
-            var (row,col) = pair.Key;
+            var (row, col) = pair.Key;
             _grid[row, col] = pair.Value;
         }
     }
-    
+
     public override string ToString()
     {
         var sb = new StringBuilder(Size * Size);
@@ -670,6 +664,51 @@ public class Sudoku
         }
 
         return sb.ToString();
+    }
+
+    public static int GetSquareId(int row, int col) => row / 3 * 3 + col / 3;
+
+    public static IReadOnlyCollection<(int row, int col)> GetLocationsForRow(int row)
+    {
+        if (!_rowLocations.TryGetValue(row, out var locations))
+        {
+            locations = new List<(int row, int col)>();
+            for (int col = 0; col < Size; col++)
+                locations.Add((row, col));
+
+            _rowLocations.Add(row, locations);
+        }
+        return locations;
+    }
+    public static IReadOnlyCollection<(int row, int col)> GetLocationsForCol(int col)
+    {
+        if (!_colLocations.TryGetValue(col, out var locations))
+        {
+            locations = new List<(int row, int col)>();
+            for (int row = 0; row < Size; row++)
+                locations.Add((row, col));
+
+            _colLocations.Add(col, locations);
+        }
+        return locations;
+    }
+
+    public static IReadOnlyCollection<(int row, int col)> GetLocationsForSquare(int id)
+    {
+        if (!_squareLocations.TryGetValue(id, out var locations))
+        {
+            locations = new List<(int row, int col)>();
+            for (int row = 0; row < Size / 3; row++)
+                for (int col = 0; col < Size / 3; col++)
+                {
+                    var r = id / 3 * 3 + row;
+                    var c = id % 3 * 3 + col;
+                    locations.Add((r, c));
+                }
+
+            _squareLocations.Add(id, locations);
+        }
+        return locations;
     }
 
     public class RowConstraint : Constraint<(int row, int col), int>
@@ -734,17 +773,17 @@ public class Sudoku
         {
             var uniqueDigits = new HashSet<int>(Size);
             var allDigits = new List<int>(Size);
-            for (int r = 0; r < Size/3; r++)
-            for (int c = 0; c < Size/3; c++)
-            {
-                var row = _id / 3 * 3 + r;
-                var col = _id % 3 * 3 + c;
-                if (assignment.TryGetValue((row, col), out var digit) && digit != 0)
+            for (int r = 0; r < Size / 3; r++)
+                for (int c = 0; c < Size / 3; c++)
                 {
-                    uniqueDigits.Add(digit);
-                    allDigits.Add(digit);
+                    var row = _id / 3 * 3 + r;
+                    var col = _id % 3 * 3 + c;
+                    if (assignment.TryGetValue((row, col), out var digit) && digit != 0)
+                    {
+                        uniqueDigits.Add(digit);
+                        allDigits.Add(digit);
+                    }
                 }
-            }
 
             return uniqueDigits.Count == allDigits.Count;
         }
@@ -752,7 +791,7 @@ public class Sudoku
 
     public class SudokuConstraint : Constraint<(int row, int col), int>//domain = digits
     {
-        public SudokuConstraint(IReadOnlyCollection<(int row, int col)> cells) : base(cells) {}
+        public SudokuConstraint(IReadOnlyCollection<(int row, int col)> cells) : base(cells) { }
 
         public override bool IsSatisfied(IReadOnlyDictionary<(int row, int col), int> assignment) => !assignment
             .Any(p => DoesRowContainDuplicates(p.Key, p.Value, assignment)
@@ -762,28 +801,27 @@ public class Sudoku
         private bool DoesRowContainDuplicates((int row, int col) cell, int digit
             , IReadOnlyDictionary<(int row, int col), int> assignment)
         {
-            for (int col = 0; col < Size; col++)
+            foreach ((int row, int col) in GetLocationsForRow(cell.row))
             {
                 if (col == cell.col) continue;//do not compare the input cell with itself
-                
-                var key = (cell.row, col);
-                if (assignment.TryGetValue(key, out var currentDigit) && currentDigit == digit)
+
+                if (assignment.TryGetValue((row, col), out var currentDigit) && currentDigit == digit)
                     return true;
             }
 
             return false;
         }
-    
+
         private bool DoesColContainDuplicates((int row, int col) cell, int digit
             , IReadOnlyDictionary<(int row, int col), int> assignment)
         {
-            for (int row = 0; row < Size; row++)
+            foreach ((int row, int col) in GetLocationsForCol(cell.col))
             {
                 if (row == cell.row) continue;//do not compare the input cell with itself
-                
-                var key = (row, cell.col);
-                if (assignment.TryGetValue(key, out var currentDigit) && currentDigit == digit)
-                    return true;            }
+
+                if (assignment.TryGetValue((row, col), out var currentDigit) && currentDigit == digit)
+                    return true;
+            }
 
             return false;
         }
@@ -791,17 +829,12 @@ public class Sudoku
         private bool DoesSquareContainDuplicates((int row, int col) cell, int digit
             , IReadOnlyDictionary<(int row, int col), int> assignment)
         {
-            for (int r = 0; r < Size/3; r++)
-            for (int c = 0; c < Size/3; c++)
+            foreach ((int row, int col) in GetLocationsForSquare(GetSquareId(cell.row, cell.col)))
             {
-                var aRow = cell.row / 3 * 3 + r;
-                var aCol = cell.col / 3 * 3 + c;
-
-                if (aRow == cell.row && aCol == cell.col)
+                if (row == cell.row && col == cell.col)
                     continue;//do not compare the input cell with itself
 
-                var key = (aRow, aCol);
-                if (assignment.TryGetValue(key, out var currentDigit) && currentDigit == digit)
+                if (assignment.TryGetValue((row, col), out var currentDigit) && currentDigit == digit)
                     return true;
             }
 
