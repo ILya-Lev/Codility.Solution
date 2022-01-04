@@ -47,6 +47,18 @@ public class SudokuTests
             { 8, 0, 1, 0, 6, 0, 0, 0, 0 },
             { 0, 0, 0, 7, 0, 0, 0, 6, 3 },
         }},
+        new object[]{"expert", new[,]
+        {
+            { 0, 0, 0, 0, 5, 0, 0, 0, 4 },
+            { 0, 4, 0, 2, 0, 0, 3, 0, 6 },
+            { 0, 0, 2, 0, 0, 0, 0, 0, 0 },
+            { 3, 0, 0, 0, 6, 0, 4, 0, 0 },
+            { 0, 0, 9, 0, 8, 0, 0, 0, 0 },
+            { 0, 0, 1, 0, 0, 4, 0, 2, 0 },
+            { 0, 0, 0, 5, 0, 1, 0, 7, 0 },
+            { 0, 0, 0, 0, 4, 0, 0, 0, 1 },
+            { 6, 0, 0, 0, 0, 0, 0, 0, 9 },
+        }},
     };
 
     [Theory, MemberData(nameof(Initials))]
@@ -62,9 +74,11 @@ public class SudokuTests
 
         var range = Enumerable.Range(1, Sudoku.Size).ToArray();
 
-        var ranges = variables
-            .ToDictionary(v => v, v => initial[v.r, v.c] != 0 ? new[] { initial[v.r, v.c] } : range)
-            .ToDictionary(p => p.Key, p => (IReadOnlyCollection<int>)p.Value);
+        //improves performance ~x250 times for Hard level
+        var ranges = variables.ToDictionary(v => v, v => sudoku.GetRange(v.r, v.c));
+        //var ranges = variables
+        //    .ToDictionary(v => v, v => initial[v.r, v.c] != 0 ? new[] { initial[v.r, v.c] } : range)
+        //    .ToDictionary(p => p.Key, p => (IReadOnlyCollection<int>)p.Value);
 
         var solver = new ConstraintSatisfactoryProblem<(int, int), int>(variables, ranges);
         solver.AddConstraint(new Sudoku.SudokuConstraint(variables));

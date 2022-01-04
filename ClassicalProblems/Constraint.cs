@@ -607,6 +607,36 @@ public class Sudoku
         }
     }
 
+    public IReadOnlyCollection<int> GetRange(int row, int col)
+    {
+        if (_grid[row, col] != 0) return new []{_grid[row, col]};
+
+        var range = Enumerable.Range(1, Size).ToArray();
+        //go over row
+        for (int c = 0; c < Size; c++)
+        {
+            if (_grid[row, c] != 0)
+                range[_grid[row, c] - 1] = 0;
+        }
+        //go over col
+        for (int r = 0; r < Size; r++)
+        {
+            if (_grid[r, col] != 0)
+                range[_grid[r, col] - 1] = 0;
+        }
+        //go over square
+        for (int r = 0; r < Size/3; r++)
+        for (int c = 0; c < Size/3; c++)
+        {
+            var aRow = row / 3 * 3 + r;
+            var aCol = col / 3 * 3 + c;
+            if (_grid[aRow, aCol] != 0)
+                range[_grid[aRow, aCol] - 1] = 0;
+        }
+
+        return range.Where(d => d != 0).ToArray();
+    }
+
     public bool IsFilledIn()
     {
         for (int row = 0; row < Size; row++)
