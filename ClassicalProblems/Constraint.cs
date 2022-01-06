@@ -79,8 +79,8 @@ public class ConstraintSatisfactoryProblem<V, D>
 public abstract class Constraint<V, D>
 {
     public IReadOnlyList<V> Variables { get; }
-    protected Constraint(IReadOnlyCollection<V> variables) =>
-        Variables = variables.ToArray();
+    protected Constraint(IReadOnlyCollection<V> letters) =>
+        Variables = letters.ToArray();
 
     public abstract bool IsSatisfied(IReadOnlyDictionary<V, D> assignment);
 }
@@ -841,4 +841,67 @@ public class Sudoku
             return false;
         }
     }
+}
+
+public class AnimalPuzzle
+{
+    public static int GetFinalResult()
+    {
+        var variables = new[] { 'a', 'b', 'c' };
+        var range = Enumerable.Range(0, 60).ToArray();
+        var ranges = variables.ToDictionary(v => v, v => (IReadOnlyCollection<int>)range);
+        
+        var csp = new ConstraintSatisfactoryProblem<char, int>(variables, ranges);
+        csp.AddConstraint(new AnimalConstraint(variables));
+
+        var solution = csp.BacktrackingSearch();
+        if (solution is null) return 0;
+
+        return solution['a'] + solution['b'] * solution['c'];
+    }
+
+    public class AnimalConstraint : Constraint<char, int>
+    {
+        private readonly IReadOnlyList<char> _letters;
+
+        //a,b,c
+        //a+a+a=60
+        //b+b+a=28
+        //c+c+b=10
+        //a+c*b = d - find d
+        public AnimalConstraint(IReadOnlyList<char> letters) : base(letters) => _letters = letters;
+
+        public override bool IsSatisfied(IReadOnlyDictionary<char, int> assignment)
+        {
+            if (!AllDigitsAreUnique(assignment)) return false;
+            if (!AllLettersAreAssigned(assignment)) return true;//continue filling it up
+
+            var a = assignment['a'];
+            var b = assignment['b'];
+            var c = assignment['c'];
+
+            return MatchFirstCondition(a) && MatchSecondCondition(a, b) && MatchThirdCondition(b, c);
+        }
+
+        private bool MatchFirstCondition(int a) => a + a + a == 60;
+        private bool MatchSecondCondition(int a, int b) => b + b + a == 28;
+        private bool MatchThirdCondition(int b, int c) => c + c + b == 10;
+
+        private bool AllDigitsAreUnique(IReadOnlyDictionary<char, int> assignment)
+        {
+            return new HashSet<int>(assignment.Values).Count == assignment.Count;
+        }
+
+        private bool AllLettersAreAssigned(IReadOnlyDictionary<char, int> assignment)
+        {
+            return _letters.All(assignment.ContainsKey);
+        }
+    }
+}
+
+//the problem is inspired by
+//https://dou.ua/lenta/interviews/dev-challenge-experience/?from=tge&utm_source=telegram&utm_medium=social
+public class ExpressionParser
+{
+    
 }
