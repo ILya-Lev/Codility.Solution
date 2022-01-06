@@ -850,7 +850,7 @@ public class AnimalPuzzle
         var variables = new[] { 'a', 'b', 'c' };
         var range = Enumerable.Range(0, 60).ToArray();
         var ranges = variables.ToDictionary(v => v, v => (IReadOnlyCollection<int>)range);
-        
+
         var csp = new ConstraintSatisfactoryProblem<char, int>(variables, ranges);
         csp.AddConstraint(new AnimalConstraint(variables));
 
@@ -903,5 +903,101 @@ public class AnimalPuzzle
 //https://dou.ua/lenta/interviews/dev-challenge-experience/?from=tge&utm_source=telegram&utm_medium=social
 public class ExpressionParser
 {
-    
+    private readonly IReadOnlyList<string> _equalities;
+    private char[] _variables;
+
+    public char[] Variables => _variables ??= GetVariables();
+
+    public ExpressionParser(List<string> equalities) => _equalities = equalities;
+
+    private Func<IReadOnlyDictionary<char, double>, bool> ParseAsPredicate(string equality)
+    {
+        var equalityLocation = equality.IndexOf('=');
+        if (equalityLocation == -1) throw new ArgumentException($"Equality symbol is missing in: {equality}");
+
+        var lhs = equality.Substring(0, equalityLocation);
+        var rhs = equality.Substring(equalityLocation + 1);
+
+        return assignment => Calculate(assignment, lhs) == Calculate(assignment, rhs);
+    }
+
+    private double Calculate(IReadOnlyDictionary<char, double> assignment, string expression)
+    {
+        var supportedOperations = new HashSet<char>(new[] { '+', '-', '*', '/' });
+        var terms = new List<Term>();
+        for (var i = 0; i < expression.Length; i++)
+        {
+            if (char.IsLetter(expression[i]))
+            {
+                var operand = new Operand(assignment[expression[i]]);
+                terms.Add(operand);
+            }
+
+            else if (supportedOperations.Contains(expression[i]))
+            {
+                var operation = new Operation(expression[i]);
+                terms.Add(operation);
+            }
+            else if (char.IsDigit(expression[i]) || char.IsSeparator(expression[i]))
+            {
+                var numberParts = new List<char>();
+                while (i < expression.Length && (char.IsDigit(expression[i]) || char.IsSeparator(expression[i])))
+                {
+                    numberParts.Add(expression[i++]);
+                }
+
+                var value = double.Parse(new string(numberParts.ToArray()));
+                var operand = new Operand(value);
+                terms.Add(operand);
+            }
+        }
+
+        for (int i = 0; i < terms.Count; i++)
+        {
+            terms[i].Position = i;
+        }
+
+        var queue = new PriorityQueue<Operation, int>(terms.Where(t => t is Operation).Select(t =>
+        {
+            var p = t as Operation;
+            return (p, p.Priority);
+        }));
+
+        //think it over!
+        throw new NotImplementedException("not finished yet!");
+    }
+
+    private char[] GetVariables() => _equalities
+        .SelectMany(e => e.ToLowerInvariant().ToCharArray())
+        .Where(char.IsLetter)
+        .Distinct()
+        .ToArray();
+
+    private class Term
+    {
+        public int Position { get; set; }
+    }
+
+    private class Operation : Term
+    {
+        public int Priority { get; }
+
+        public Operation(char token)
+        {
+            Priority = token switch
+            {
+                '*' => 1,
+                '/' => 1,
+                '+' => 2,
+                '-' => 2,
+                _ => throw new InvalidOperationException($"Token '{token}' is not supported as an operation")
+            };
+        }
+    }
+
+    private class Operand : Term
+    {
+        public double Value { get; }
+        public Operand(double value) => Value = value;
+    }
 }
