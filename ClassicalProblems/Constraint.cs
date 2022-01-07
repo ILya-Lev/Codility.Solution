@@ -910,7 +910,7 @@ public class ExpressionParser
 
     public ExpressionParser(List<string> equalities) => _equalities = equalities;
 
-    private Func<IReadOnlyDictionary<char, double>, bool> ParseAsPredicate(string equality)
+    public static Func<IReadOnlyDictionary<char, double>, bool> ParseAsPredicate(string equality)
     {
         var equalityLocation = equality.IndexOf('=');
         if (equalityLocation == -1) throw new ArgumentException($"Equality symbol is missing in: {equality}");
@@ -921,7 +921,7 @@ public class ExpressionParser
         return assignment => Calculate(assignment, lhs) == Calculate(assignment, rhs);
     }
 
-    private double Calculate(IReadOnlyDictionary<char, double> assignment, string expression)
+    public static double Calculate(IReadOnlyDictionary<char, double> assignment, string expression)
     {
         var supportedOperations = new HashSet<char>(new[] { '+', '-', '*', '/' });
         var terms = new List<Term>();
@@ -960,11 +960,32 @@ public class ExpressionParser
         var queue = new PriorityQueue<Operation, int>(terms.Where(t => t is Operation).Select(t =>
         {
             var p = t as Operation;
-            return (p, p.Priority);
-        }));
+            return (p, p!.Priority);
+        })!);
 
-        //think it over!
-        throw new NotImplementedException("not finished yet!");
+        while (queue.Count != 0)
+        {
+            var op = queue.Dequeue();
+            
+            var lhs = terms[op.Position - 1] as Operand 
+                    ?? throw new Exception($"term at position {op.Position-1} is not an Operand");
+            var rhs = terms[op.Position + 1] as Operand
+                    ?? throw new Exception($"term at position {op.Position-1} is not an Operand");
+
+            var value = op.Evaluate(lhs, rhs);
+            var operand = new Operand(value) { Position = op.Position - 1 };
+
+            terms.RemoveAt(op.Position-1);
+            terms.RemoveAt(op.Position-1);
+            terms.RemoveAt(op.Position-1);
+
+            terms.Insert(operand.Position, operand);
+            
+            for (int i = op.Position; i < terms.Count; i++)
+                terms[i].Position = i;
+        }
+
+        return (terms.First() as Operand)!.Value;
     }
 
     private char[] GetVariables() => _equalities
@@ -980,10 +1001,13 @@ public class ExpressionParser
 
     private class Operation : Term
     {
+        private readonly Func<double, double, double> _evaluator;
         public int Priority { get; }
+        public char Token { get; }
 
         public Operation(char token)
         {
+            Token = token;
             Priority = token switch
             {
                 '*' => 1,
@@ -992,12 +1016,24 @@ public class ExpressionParser
                 '-' => 2,
                 _ => throw new InvalidOperationException($"Token '{token}' is not supported as an operation")
             };
+            
+            _evaluator = token switch
+            {
+                '*' => (a, b) => a*b,
+                '/' => (a, b) => b==0.0 ? double.NaN : a/b,
+                '+' => (a, b) => a+b,
+                '-' => (a, b) => a-b,
+            };
         }
+
+        public double Evaluate(Operand lhs, Operand rhs) => _evaluator(lhs.Value, rhs.Value);
+        public override string ToString() => $"{Position}: {Token}";
     }
 
     private class Operand : Term
     {
         public double Value { get; }
         public Operand(double value) => Value = value;
+        public override string ToString() => $"{Position}: {Value}";
     }
 }
