@@ -860,6 +860,25 @@ public class AnimalPuzzle
         return solution['a'] + solution['b'] * solution['c'];
     }
 
+    public static double GetFinalResultFlexible(IReadOnlyList<string> equations, string expression)
+    {
+        var parser = new EqualityParser(equations);
+
+        var variables = parser.Variables;
+        var maxValue = (int)parser.GetMaxValue();
+        var range = Enumerable.Range(0, maxValue).Select(n => (double)n).ToArray();
+        var ranges = variables.ToDictionary(v => v, v => (IReadOnlyCollection<double>)range);
+
+        var csp = new ConstraintSatisfactoryProblem<char, double>(variables, ranges);
+        csp.AddConstraint(new AnimalConstraintFlexible(variables, parser.AreAllSatisfied));
+
+        var solution = csp.BacktrackingSearch();
+        if (solution is null) return 0;
+
+        var expressionParser = new EqualityParser.ExpressionParser(expression);
+        return expressionParser.Calculate(solution);
+    }
+
     public class AnimalConstraint : Constraint<char, int>
     {
         private readonly IReadOnlyList<char> _letters;
@@ -897,95 +916,79 @@ public class AnimalPuzzle
             return _letters.All(assignment.ContainsKey);
         }
     }
+
+    public class AnimalConstraintFlexible : Constraint<char, double>
+    {
+        private readonly IReadOnlyList<char> _letters;
+        private readonly Func<IReadOnlyDictionary<char, double>, bool> _predicate;
+
+        public AnimalConstraintFlexible(IReadOnlyList<char> letters
+            , Func<IReadOnlyDictionary<char, double>, bool> predicate)
+            : base(letters)
+        {
+            _letters = letters;
+            _predicate = predicate;
+        }
+
+        public override bool IsSatisfied(IReadOnlyDictionary<char, double> assignment)
+        {
+            if (!AllDigitsAreUnique(assignment)) return false;
+            if (!AllLettersAreAssigned(assignment)) return true;//continue filling it up
+            return _predicate(assignment);
+        }
+
+        private bool AllDigitsAreUnique(IReadOnlyDictionary<char, double> assignment)
+        {
+            return new HashSet<double>(assignment.Values).Count == assignment.Count;
+        }
+
+        private bool AllLettersAreAssigned(IReadOnlyDictionary<char, double> assignment)
+        {
+            return _letters.All(assignment.ContainsKey);
+        }
+    }
 }
+
 
 //the problem is inspired by
 //https://dou.ua/lenta/interviews/dev-challenge-experience/?from=tge&utm_source=telegram&utm_medium=social
-public class ExpressionParser
+public class EqualityParser
 {
     private readonly IReadOnlyList<string> _equalities;
+    private readonly IReadOnlyDictionary<string, (ExpressionParser, ExpressionParser)> _expressions;
+
     private char[] _variables;
 
     public char[] Variables => _variables ??= GetVariables();
 
-    public ExpressionParser(List<string> equalities) => _equalities = equalities;
+    public EqualityParser(IReadOnlyList<string> equalities)
+    {
+        _equalities = equalities;
+        _expressions = _equalities.ToDictionary(e => e, SplitToExpressions);
+    }
 
-    public static Func<IReadOnlyDictionary<char, double>, bool> ParseAsPredicate(string equality)
+    public bool AreAllSatisfied(IReadOnlyDictionary<char, double> assignment) => _expressions.Values
+        .All(e => e.Item1.Calculate(assignment) == e.Item2.Calculate(assignment));
+
+    public double GetMaxValue()
+    {
+        var maxValues = _expressions.Values
+            .Select(e => Math.Max(e.Item1.GetMaxValue(), e.Item2.GetMaxValue()))
+            .ToArray();
+
+        return maxValues.Any() ? maxValues.Max() : 100;
+    }
+    
+    private (ExpressionParser, ExpressionParser) SplitToExpressions(string equality)
     {
         var equalityLocation = equality.IndexOf('=');
-        if (equalityLocation == -1) throw new ArgumentException($"Equality symbol is missing in: {equality}");
+        if (equalityLocation == -1)
+            throw new ArgumentException($"Equality symbol is missing in: {equality}");
 
         var lhs = equality.Substring(0, equalityLocation);
         var rhs = equality.Substring(equalityLocation + 1);
 
-        return assignment => Calculate(assignment, lhs) == Calculate(assignment, rhs);
-    }
-
-    public static double Calculate(IReadOnlyDictionary<char, double> assignment, string expression)
-    {
-        var supportedOperations = new HashSet<char>(new[] { '+', '-', '*', '/' });
-        var terms = new List<Term>();
-        for (var i = 0; i < expression.Length; i++)
-        {
-            if (char.IsLetter(expression[i]))
-            {
-                var operand = new Operand(assignment[expression[i]]);
-                terms.Add(operand);
-            }
-
-            else if (supportedOperations.Contains(expression[i]))
-            {
-                var operation = new Operation(expression[i]);
-                terms.Add(operation);
-            }
-            else if (char.IsDigit(expression[i]) || char.IsSeparator(expression[i]))
-            {
-                var numberParts = new List<char>();
-                while (i < expression.Length && (char.IsDigit(expression[i]) || char.IsSeparator(expression[i])))
-                {
-                    numberParts.Add(expression[i++]);
-                }
-
-                var value = double.Parse(new string(numberParts.ToArray()));
-                var operand = new Operand(value);
-                terms.Add(operand);
-            }
-        }
-
-        for (int i = 0; i < terms.Count; i++)
-        {
-            terms[i].Position = i;
-        }
-
-        var queue = new PriorityQueue<Operation, int>(terms.Where(t => t is Operation).Select(t =>
-        {
-            var p = t as Operation;
-            return (p, p!.Priority);
-        })!);
-
-        while (queue.Count != 0)
-        {
-            var op = queue.Dequeue();
-            
-            var lhs = terms[op.Position - 1] as Operand 
-                    ?? throw new Exception($"term at position {op.Position-1} is not an Operand");
-            var rhs = terms[op.Position + 1] as Operand
-                    ?? throw new Exception($"term at position {op.Position-1} is not an Operand");
-
-            var value = op.Evaluate(lhs, rhs);
-            var operand = new Operand(value) { Position = op.Position - 1 };
-
-            terms.RemoveAt(op.Position-1);
-            terms.RemoveAt(op.Position-1);
-            terms.RemoveAt(op.Position-1);
-
-            terms.Insert(operand.Position, operand);
-            
-            for (int i = op.Position; i < terms.Count; i++)
-                terms[i].Position = i;
-        }
-
-        return (terms.First() as Operand)!.Value;
+        return (new ExpressionParser(lhs), new ExpressionParser(rhs));
     }
 
     private char[] GetVariables() => _equalities
@@ -993,6 +996,119 @@ public class ExpressionParser
         .Where(char.IsLetter)
         .Distinct()
         .ToArray();
+
+    public class ExpressionParser
+    {
+        private static readonly HashSet<char> _supportedOperations = new (new[]
+        {
+            '+', '-', '*', '/'
+        });
+        private readonly List<Term> _terms;
+        private readonly PriorityQueue<Operation, int> _operationQueue;
+        
+        public string Expression { get; }
+
+        public ExpressionParser(string expression)
+        {
+            Expression = expression;
+            _terms = PreprocessExpression(expression);
+
+            var operations = _terms.OfType<Operation>().Select(p => (p, p.Priority));
+            _operationQueue = new PriorityQueue<Operation, int>(operations);
+        }
+
+        public double GetMaxValue()
+        {
+            var values = _terms.OfType<Operand>().Select(p => Math.Abs(p.Value)).ToArray();
+            return values.Any() ? values.Max() : 0;
+        }
+
+        public double Calculate(IReadOnlyDictionary<char, double> assignment)
+        {
+            var terms = _terms.ToList();//deep copy
+            var queue = new PriorityQueue<Operation, int>(_operationQueue.UnorderedItems);//deep copy
+
+            while (queue.Count != 0)
+            {
+                var op = queue.Dequeue();
+            
+                var lhs = GetOperand(terms, op.Position-1, assignment);
+                var rhs = GetOperand(terms, op.Position+1, assignment);
+
+                var value = op.Evaluate(lhs, rhs);
+                var operand = new Operand(value) { Position = op.Position - 1 };
+
+                terms.RemoveAt(op.Position-1);
+                terms.RemoveAt(op.Position-1);
+                terms.RemoveAt(op.Position-1);
+
+                terms.Insert(operand.Position, operand);
+            
+                for (int i = op.Position; i < terms.Count; i++)
+                    terms[i].Position = i;
+            }
+
+            return (terms.First() as Operand)!.Value;
+        }
+
+        private static Operand GetOperand(List<Term> terms, int position,
+            IReadOnlyDictionary<char, double> assignment)
+        {
+            if (terms[position] is Operand operand) return operand;
+            
+            if (terms[position] is Variable variable)
+            {
+                if (!assignment.TryGetValue(variable.Name[0], out var value))
+                    throw new Exception($"Variable {variable} is not assigned");
+                return new Operand(value) { Position = position };
+            }
+
+            throw new Exception($"term at position {position} is not an Operand");
+        }
+        
+        private List<Term> PreprocessExpression(string expression)
+        {
+            var terms = new List<Term>();
+            for (var i = 0; i < expression.Length; i++)
+            {
+                if (char.IsLetter(expression[i]))
+                {
+                    var nameParts = new List<char>();
+                    while (i < expression.Length && char.IsLetter(expression[i]))
+                        nameParts.Add(expression[i++]);
+                    i--;//as we do i++ in outer loop
+                    var variable = new Variable(new string(nameParts.ToArray()));
+                    terms.Add(variable);
+                }
+                else if (_supportedOperations.Contains(expression[i]))
+                {
+                    var operation = new Operation(expression[i]);
+                    terms.Add(operation);
+                }
+                else if (char.IsDigit(expression[i]) || char.IsSeparator(expression[i]))
+                {
+                    var numberParts = new List<char>();
+                    while (i < expression.Length
+                           && (char.IsDigit(expression[i]) || char.IsSeparator(expression[i])))
+                    {
+                        numberParts.Add(expression[i++]);
+                    }
+                    i--;//as we do i++ in outer loop
+
+                    var value = double.Parse(new string(numberParts.ToArray()));
+                    var operand = new Operand(value);
+                    terms.Add(operand);
+                }
+            }
+
+            for (int i = 0; i < terms.Count; i++)
+            {
+                terms[i].Position = i;
+            }
+            
+            return terms;
+        }
+    }
 
     private class Term
     {
@@ -1035,5 +1151,12 @@ public class ExpressionParser
         public double Value { get; }
         public Operand(double value) => Value = value;
         public override string ToString() => $"{Position}: {Value}";
+    }
+
+    private class Variable : Term
+    {
+        public string Name { get; }
+        public Variable(string name) => Name = name;
+        public override string ToString() => $"{Position}: {Name}";
     }
 }
