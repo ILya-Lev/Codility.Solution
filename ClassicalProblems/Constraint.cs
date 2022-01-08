@@ -1160,3 +1160,4 @@ public class EqualityParser
         public override string ToString() => $"{Position}: {Name}";
     }
 }
+

@@ -101,4 +101,22 @@ public class HyperloopTests
         var report = _weightedCityGraph.ConvertMstToString(tree);
         _output.WriteLine(report);
     }
+
+    [Theory]
+    [InlineData("LosAngeles", "Boston")]
+    public void Dijkstra_FromLosAngeles_FindShortest(string origin, string target)
+    {
+        var markResult = _weightedCityGraph.FindAllPaths(origin);
+
+        _output.WriteLine($"Distances from {origin}");
+        var distanceByName = _weightedCityGraph.GetDistanceByVertex(markResult.Distances);
+        foreach (var pair in distanceByName)
+            _output.WriteLine($"{pair.Key}: {pair.Value}");
+
+        var originIndex = _weightedCityGraph.GetIndexOf(origin);
+        var targetIndex = _weightedCityGraph.GetIndexOf(target);
+        var path = _weightedCityGraph.GetPath(originIndex, targetIndex, markResult.PointingEdgeByVertex);
+        var pathAsString = _weightedCityGraph.ConvertMstToString(path);
+        _output.WriteLine(pathAsString);
+    }
 }

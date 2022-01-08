@@ -7,13 +7,13 @@ public class Edge
     public int From { get; }
     public int To { get; }
     public Edge(int from, int to) => (From, To) = (from, to);
-    public virtual Edge CreateReversed() => new (To, From);
+    public virtual Edge CreateReversed() => new(To, From);
     public override string ToString() => $"{From:D3} -> {To:D3}";
 }
 
 public class WeightedEdge : Edge, IComparable<WeightedEdge>
 {
-    public double Weight { get;}
+    public double Weight { get; }
     public WeightedEdge(int from, int to, double weight) : base(from, to) => Weight = weight;
     public int CompareTo(WeightedEdge other) => Weight.CompareTo(other.Weight);
     public override Edge CreateReversed() => new WeightedEdge(To, From, Weight);
@@ -62,7 +62,7 @@ public abstract class Graph<V, E>
     public IReadOnlyList<E> GetEdgesOf(V vertex) => _edges[GetIndexOf(vertex)];
 
     public abstract void AddEdge(E edge);
-    
+
     public override string ToString()
     {
         var sb = new StringBuilder();
@@ -104,7 +104,7 @@ public class UnweightedGraph<V> : Graph<V, Edge>
     }
 }
 
-public class WeightedGraph<V> : Graph<V, WeightedEdge>
+public class WeightedGraph<V> : Graph<V, WeightedEdge> where V : notnull
 {
     public WeightedGraph(IEnumerable<V> vertices) : base(vertices) { }
 
@@ -117,7 +117,7 @@ public class WeightedGraph<V> : Graph<V, WeightedEdge>
     public void AddEdge(int from, int to, double weight) => AddEdge(new WeightedEdge(from, to, weight));
 
     public void AddEdge(V from, V to, double weight) => AddEdge(GetIndexOf(from), GetIndexOf(to), weight);
-    
+
     public override string ToString()
     {
         var sb = new StringBuilder();
@@ -131,7 +131,7 @@ public class WeightedGraph<V> : Graph<V, WeightedEdge>
 
         return sb.ToString();
     }
-    
+
     /// <summary>
     /// algorithm by Prim or Jarnik
     /// does not work with directed edges and unbounded graphs
@@ -143,9 +143,9 @@ public class WeightedGraph<V> : Graph<V, WeightedEdge>
 
         var seen = new HashSet<int>();
         var superEdge = new PriorityQueue<WeightedEdge, double>();
-        
+
         var seedIndex = new Random(DateTime.UtcNow.Millisecond).Next(0, VertexCount);
-        
+
         seen.Add(seedIndex);
         superEdge.EnqueueRange(OutboundEdges(seedIndex));
 
@@ -160,7 +160,7 @@ public class WeightedGraph<V> : Graph<V, WeightedEdge>
 
         return tree;
 
-        IEnumerable<(WeightedEdge e, double Weight)> OutboundEdges(int vertexIndex) => 
+        IEnumerable<(WeightedEdge e, double Weight)> OutboundEdges(int vertexIndex) =>
             GetEdgesOf(vertexIndex)
             .Where(e => !seen.Contains(e.To))
             .Select(e => (e, e.Weight));
@@ -176,5 +176,86 @@ public class WeightedGraph<V> : Graph<V, WeightedEdge>
 
         sb.AppendLine($"Total Weight: {tree.Sum(e => e.Weight)}");
         return sb.ToString();
+    }
+
+    public DijkstraResult FindAllPaths(V origin)
+    {
+        int originIndex = GetIndexOf(origin);
+
+        var distances = new double[VertexCount];
+        distances[originIndex] = 0;
+
+        var seen = new HashSet<int> { originIndex };
+
+        var pointingEdgeByVertex = new Dictionary<int, WeightedEdge>();
+        var queue = new PriorityQueue<DijkstraNode, double>();
+        queue.Enqueue(new DijkstraNode(originIndex, 0), 0);
+
+        while (queue.Count != 0)
+        {
+            var currentNode = queue.Dequeue();
+            var currentVertex = currentNode.Vertex;
+            var currentDistance = distances[currentVertex];
+
+            foreach (var edge in GetEdgesOf(currentVertex))
+            {
+                var distanceTo = currentDistance + edge.Weight;
+                if (!seen.Contains(edge.To) || distances[edge.To] > distanceTo)
+                {
+                    seen.Add(edge.To);
+                    distances[edge.To] = distanceTo;
+
+                    if (!pointingEdgeByVertex.ContainsKey(edge.To))
+                        pointingEdgeByVertex.Add(edge.To, null!);
+                    pointingEdgeByVertex[edge.To] = edge;
+                    
+                    queue.Enqueue(new DijkstraNode(edge.To, distanceTo), distanceTo);
+                }
+            }
+        }
+
+        return new DijkstraResult(distances, pointingEdgeByVertex);
+    }
+
+    public Dictionary<V, double> GetDistanceByVertex(double[] distance) => distance
+        .Select((d, idx) => (v: this[idx], d))
+        .ToDictionary(e => e.v, e => e.d);
+
+    public List<WeightedEdge> GetPath(int start, int finish, Dictionary<int, WeightedEdge> pointingEdgeByVertex)
+    {
+        var path = new List<WeightedEdge>();
+        for (int current = finish; current != start; )
+        {
+            var edge = pointingEdgeByVertex[current];
+            path.Add(edge);
+            current = edge.From;
+        }
+
+        path.Reverse();
+        return path;
+    }
+
+    public sealed class DijkstraNode : IComparable<DijkstraNode>
+    {
+        public int Vertex { get; }
+        public double Distance { get; }
+
+        public DijkstraNode(int vertex, double distance) => (Vertex, Distance) = (vertex, distance);
+
+        public void Deconstruct(out int vertex, out double distance) => (vertex, distance) = (Vertex, Distance);
+
+        public int CompareTo(DijkstraNode? other) => Distance.CompareTo(other?.Distance ?? double.MaxValue);
+    }
+
+    public sealed class DijkstraResult
+    {
+        public double[] Distances { get; }
+        public Dictionary<int, WeightedEdge> PointingEdgeByVertex { get; }
+
+        public DijkstraResult(double[] distances, Dictionary<int, WeightedEdge> pointingEdgeByVertex)
+        {
+            Distances = distances;
+            PointingEdgeByVertex = pointingEdgeByVertex;
+        }
     }
 }
