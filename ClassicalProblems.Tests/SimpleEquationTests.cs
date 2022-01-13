@@ -56,4 +56,47 @@ public class SimpleEquationTests
         _output.WriteLine(report);
         _output.WriteLine($"Solution {equation}");
     }
+
+
+    [Theory]
+    [InlineData(1_000, 1_000, 1.0, 0.2, 0.7)]
+    public void Run_SendMoreMoney_Roulette_FindSolution(int populationSize
+        , int generations, double threshold//=1.0 as proper solution gives (send+more) == money => (send+more)/money = 1.0
+        , double mutationChance, double crossoverChance)
+    {
+        var initialPopulation = Enumerable.Range(1, populationSize)
+            .Select(_ => SendMoreMoney.GetRandomInstance())
+            .ToArray();
+        
+        var parentSelectionStrategy = new RouletteParentSelectionStrategy<SendMoreMoney>();
+
+        var geneticAlgorithm = new GeneticAlgorithm<SendMoreMoney>(initialPopulation
+            , mutationChance, crossoverChance, parentSelectionStrategy);
+
+        var (setting, report) = geneticAlgorithm.Run(generations, threshold);
+
+        _output.WriteLine(report);
+        _output.WriteLine($"Solution {setting}");
+    }
+
+    [Theory]
+    [InlineData(1_000, 1_000, 1.0, 0.2, 0.7)]
+    public void Run_SendMoreMoney_Tournament_FindSolution(int populationSize
+        , int generations, double threshold
+        , double mutationChance, double crossoverChance)
+    {
+        var initialPopulation = Enumerable.Range(1, populationSize)
+            .Select(_ => SendMoreMoney.GetRandomInstance())
+            .ToArray();
+        
+        var parentSelectionStrategy = new TournamentParentSelectionStrategy<SendMoreMoney>();
+
+        var geneticAlgorithm = new GeneticAlgorithm<SendMoreMoney>(initialPopulation
+            , mutationChance, crossoverChance, parentSelectionStrategy);
+
+        var (setting, report) = geneticAlgorithm.Run(generations, threshold);
+
+        _output.WriteLine(report);
+        _output.WriteLine($"Solution {setting}");
+    }
 }

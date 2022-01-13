@@ -188,8 +188,10 @@ public class SimpleEquation : IChromosome<SimpleEquation>
     private const int MaxValue = 100;
     private static readonly Random _random = new Random(DateTime.UtcNow.Millisecond);
 
+    #region genes
     public int X { get; private set; }
     public int Y { get; private set; }
+    #endregion genes
 
     public SimpleEquation(int x, int y) => (X, Y) = (x, y);
 
@@ -217,4 +219,108 @@ public class SimpleEquation : IChromosome<SimpleEquation>
     {
         return new SimpleEquation(_random.Next(0, MaxValue), _random.Next(0, MaxValue));
     }
+}
+
+public class SendMoreMoney : IChromosome<SendMoreMoney>
+{
+    private static readonly Random _random = new (DateTime.UtcNow.Millisecond);
+
+    #region genes
+    public char[] Variables { get; }
+    #endregion genes
+
+    public SendMoreMoney(IReadOnlyCollection<char> variables) => Variables = variables.ToArray();//deep copy
+
+    public double GetFitness()
+    {
+        var s = GetValue('s');
+        var m = GetValue('m');
+
+        var (send, more, money) = GetNumbers();
+
+        var difference = Math.Abs(money - send - more);
+        
+        difference += s == 0 ? 1000 : 0;        //avoid numbers starting from 0
+        difference += m == 0 ? 1000 : 0;
+
+        return 1.0 / (difference+1);
+    }
+
+    public IReadOnlyList<SendMoreMoney> Crossover(SendMoreMoney other)
+    {
+        var lhs = Variables;
+        var rhs = other.Variables;
+
+        var idx1 = _random.Next(0, lhs.Length);
+        var idx2 = _random.Next(0, rhs.Length);
+
+        var ch1 = lhs[idx1];
+        var ch2 = rhs[idx2];
+
+        var idx3 = lhs.Select((c, i) => (c, i)).First(element => element.c == ch2).i;
+        var idx4 = rhs.Select((c, i) => (c, i)).First(element => element.c == ch1).i;
+
+        (lhs[idx1], lhs[idx3]) = (lhs[idx3], lhs[idx1]);
+        (rhs[idx2], rhs[idx4]) = (rhs[idx4], rhs[idx2]);
+
+        return new[]
+        {
+            new SendMoreMoney(lhs),
+            new SendMoreMoney(rhs),
+        };
+    }
+
+    public void Mutate()
+    {
+        var lhs = _random.Next(0, Variables.Length);
+        var rhs = _random.Next(0, Variables.Length);
+        
+        (Variables[lhs], Variables[rhs]) = (Variables[rhs], Variables[lhs]);
+    }
+
+    public SendMoreMoney Copy() => new(Variables);
+
+    public override string ToString()
+    {
+        var (send, more, money) = GetNumbers();
+        return
+            $"{string.Join(", ", Variables.Select((c, i) => $"{c}={i}"))}, {send} + {more} = {money}, difference {money - send - more}, Fitness {GetFitness()}";
+    }
+
+    public static SendMoreMoney GetRandomInstance()
+    {
+        var chars = "sendmoremoney".ToCharArray().Distinct()//representing the phrase as a set of distinct characters
+            .Concat(new []{' ', ' '})//adding 2 spaces to cover 10 digits instead of 8
+            .ToArray();
+        
+        //create a permutation
+        for (int i = 0; i < chars.Length; i++)
+        {
+            var lhs = _random.Next(0, chars.Length);
+            var rhs = _random.Next(0, chars.Length);
+        
+            (chars[lhs], chars[rhs]) = (chars[rhs], chars[lhs]);
+        }
+        
+        return new SendMoreMoney(chars);
+    }
+
+    private (int a, int b, int c) GetNumbers()
+    {
+        var s = GetValue('s');//index of the char is its value; 8 chars + 2 spaces to ignore
+        var e = GetValue('e');
+        var n = GetValue('n');
+        var d = GetValue('d');
+        var m = GetValue('m');
+        var o = GetValue('o');
+        var r = GetValue('r');
+        var y = GetValue('y');
+
+        var send = s * 1_000 + e * 100 + n * 10 + d;
+        var more = m * 1_000 + o * 100 + r * 10 + e;
+        var money = m * 10_000 + o * 1_000 + n * 100 + e * 10 + y;
+        
+        return (send, more, money);
+    }
+    private int GetValue(char ch) => Variables.Select((c, i) => (c,i)).Single(element => element.c == ch).i;
 }
