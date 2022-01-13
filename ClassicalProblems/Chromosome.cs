@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.IO.Compression;
+using System.Text;
 
 namespace ClassicalProblems;
 
@@ -10,7 +11,7 @@ public interface IChromosome<T> : IComparable<T> where T : IChromosome<T>
 
     /// <summary> create a child as a combination of this and the other chromosomes </summary>
     IReadOnlyList<T> Crossover(T other);
-    
+
     /// <summary> add random changes into the given chromosome </summary>
     void Mutate();
 
@@ -92,7 +93,7 @@ public class TournamentParentSelectionStrategy<C> : IParentSelectionStrategy<C> 
             .Take(picksAmount)
             .ToList();
     }
-    
+
     private void ValidateTournament(int participantsAmount, int picksAmount, IReadOnlyList<C> population)
     {
         if (population.Count < participantsAmount)
@@ -207,7 +208,7 @@ public class SimpleEquation : IChromosome<SimpleEquation>
     {
         if (_random.NextDouble() > 0.5)
             X += _random.NextDouble() > 0.5 ? 1 : -1;
-        else    
+        else
             Y += _random.NextDouble() > 0.5 ? 1 : -1;
     }
 
@@ -223,7 +224,7 @@ public class SimpleEquation : IChromosome<SimpleEquation>
 
 public class SendMoreMoney : IChromosome<SendMoreMoney>
 {
-    private static readonly Random _random = new (DateTime.UtcNow.Millisecond);
+    private static readonly Random _random = new(DateTime.UtcNow.Millisecond);
 
     #region genes
     public char[] Variables { get; }
@@ -239,11 +240,11 @@ public class SendMoreMoney : IChromosome<SendMoreMoney>
         var (send, more, money) = GetNumbers();
 
         var difference = Math.Abs(money - send - more);
-        
+
         difference += s == 0 ? 1000 : 0;        //avoid numbers starting from 0
         difference += m == 0 ? 1000 : 0;
 
-        return 1.0 / (difference+1);
+        return 1.0 / (difference + 1);
     }
 
     public IReadOnlyList<SendMoreMoney> Crossover(SendMoreMoney other)
@@ -274,7 +275,7 @@ public class SendMoreMoney : IChromosome<SendMoreMoney>
     {
         var lhs = _random.Next(0, Variables.Length);
         var rhs = _random.Next(0, Variables.Length);
-        
+
         (Variables[lhs], Variables[rhs]) = (Variables[rhs], Variables[lhs]);
     }
 
@@ -290,18 +291,18 @@ public class SendMoreMoney : IChromosome<SendMoreMoney>
     public static SendMoreMoney GetRandomInstance()
     {
         var chars = "sendmoremoney".ToCharArray().Distinct()//representing the phrase as a set of distinct characters
-            .Concat(new []{' ', ' '})//adding 2 spaces to cover 10 digits instead of 8
+            .Concat(new[] { ' ', ' ' })//adding 2 spaces to cover 10 digits instead of 8
             .ToArray();
-        
+
         //create a permutation
         for (int i = 0; i < chars.Length; i++)
         {
             var lhs = _random.Next(0, chars.Length);
             var rhs = _random.Next(0, chars.Length);
-        
+
             (chars[lhs], chars[rhs]) = (chars[rhs], chars[lhs]);
         }
-        
+
         return new SendMoreMoney(chars);
     }
 
@@ -319,8 +320,95 @@ public class SendMoreMoney : IChromosome<SendMoreMoney>
         var send = s * 1_000 + e * 100 + n * 10 + d;
         var more = m * 1_000 + o * 100 + r * 10 + e;
         var money = m * 10_000 + o * 1_000 + n * 100 + e * 10 + y;
-        
+
         return (send, more, money);
     }
-    private int GetValue(char ch) => Variables.Select((c, i) => (c,i)).Single(element => element.c == ch).i;
+    private int GetValue(char ch) => Variables.Select((c, i) => (c, i)).Single(element => element.c == ch).i;
+}
+
+public class ListCompression : IChromosome<ListCompression>
+{
+    private static readonly Random _random = new(DateTime.UtcNow.Millisecond);
+
+    #region genes
+    public string[] Words { get; }
+    #endregion genes
+
+    public ListCompression(IReadOnlyCollection<string> words) => Words = words.ToArray();//deep copy
+
+    public double GetFitness() => 1.0 / GetSizeInBytes();
+
+    public IReadOnlyList<ListCompression> Crossover(ListCompression other)
+    {
+        var lhs = Words;
+        var rhs = other.Words;
+
+        var idx1 = _random.Next(0, lhs.Length);
+        var idx2 = _random.Next(0, rhs.Length);
+
+        var ch1 = lhs[idx1];
+        var ch2 = rhs[idx2];
+
+        var idx3 = lhs.Select((c, i) => (c, i)).First(element => element.c == ch2).i;
+        var idx4 = rhs.Select((c, i) => (c, i)).First(element => element.c == ch1).i;
+
+        (lhs[idx1], lhs[idx3]) = (lhs[idx3], lhs[idx1]);
+        (rhs[idx2], rhs[idx4]) = (rhs[idx4], rhs[idx2]);
+
+        return new[]
+        {
+            new ListCompression(lhs),
+            new ListCompression(rhs),
+        };
+    }
+
+    public void Mutate()
+    {
+        var lhs = _random.Next(0, Words.Length);
+        var rhs = _random.Next(0, Words.Length);
+
+        (Words[lhs], Words[rhs]) = (Words[rhs], Words[lhs]);
+    }
+
+    public ListCompression Copy() => new(Words);
+
+    public override string ToString() => $"{string.Join(", ", Words.Select((c, i) => $"{c}={i}"))}, {GetSizeInBytes()}, Fitness {GetFitness()}";
+
+    public static ListCompression GetRandomInstance()
+    {
+        var words = new[]
+        {
+            "Michael",
+            "Sarah", "Joshua", "Narine", "David", "Sajid", "Melanie", "Daniel",
+            "Wei", "Dean", "Brian", "Murat", "Lisa"
+        };
+
+        //create a permutation
+        for (int i = 0; i < words.Length; i++)
+        {
+            var lhs = _random.Next(0, words.Length);
+            var rhs = _random.Next(0, words.Length);
+
+            (words[lhs], words[rhs]) = (words[rhs], words[lhs]);
+        }
+
+        return new ListCompression(words);
+    }
+
+    private long GetSizeInBytes()
+    {
+        var originalBytes = Encoding.UTF8.GetBytes(string.Join("", Words));
+        try
+        {
+            using var memoryStream = new MemoryStream();
+            using var compressor = new GZipStream(memoryStream, CompressionMode.Compress);
+            compressor.Write(originalBytes, 0, originalBytes.Length);
+            return memoryStream.Length;
+        }
+        catch (Exception exc)
+        {
+            return originalBytes.LongLength;
+        }
+    }
+
 }
