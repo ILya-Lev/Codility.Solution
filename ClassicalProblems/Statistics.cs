@@ -75,15 +75,34 @@ public class DataPoint
         if (other.Originals.Count != Originals.Count)
             throw new ArgumentException($"Expected amount of points is {Originals.Count}, provided is {other?.Originals.Count}");
 
-        var distances = Originals.Zip(other.Originals, (lhs, rhs) => Math.Pow(lhs - rhs, 2)).Sum();
+        //NOTE: there was a bug - distance should be calculated on Dimensions (z-scored based values) not based on the Originals!
+        var distances = Dimensions.Zip(other.Dimensions, (lhs, rhs) => Math.Pow(lhs - rhs, 2)).Sum();
         return Math.Sqrt(distances);
     }
 
     public override string ToString() => string.Join(", ", Originals.Select(p => $"{p}"));
 }
 
+public class GovernorPoint : DataPoint
+{
+    public int Age { get; }
+    public string StateName { get; }
+    public double Longitude { get; }
+
+    public GovernorPoint(double longitude, int age, string stateName) : base(new []{longitude, age})
+    {
+        Longitude = longitude;
+        Age = age;
+        StateName = stateName;
+    }
+
+    public override string ToString() => $"{StateName}: (longitude: {Longitude}, age: {Age})";
+}
+
 public class KMeans<Point> where Point : DataPoint
 {
+    private readonly Random _random = new(DateTime.UtcNow.Millisecond);
+
     private readonly IReadOnlyList<Point> _points;
     private readonly List<Cluster> _clusters;
 
@@ -97,7 +116,7 @@ public class KMeans<Point> where Point : DataPoint
 
         ZScoreNormalize();
 
-        _clusters = Enumerable.Range(1, k).Select(n => new Cluster(CreateRandomPoint())).ToList();
+        _clusters = Enumerable.Range(1, k).Select(_ => new Cluster(CreateRandomPoint())).ToList();
     }
 
     public IReadOnlyList<Cluster> Run(int maxIterations)
@@ -108,9 +127,9 @@ public class KMeans<Point> where Point : DataPoint
                 cluster.Points.Clear();
 
             AssignClusters();
-            var previous = Centroids;
+            var previous = _clusters.Select(c => c.Centroid).ToArray();
             GenerateCentroids();
-            var current = Centroids;
+            var current = _clusters.Select(c => c.Centroid).ToArray();
             if (AreSetsEqual(previous, current))
                 break;
         }
@@ -141,7 +160,6 @@ public class KMeans<Point> where Point : DataPoint
 
     private DataPoint CreateRandomPoint()
     {
-        var random = new Random(DateTime.UtcNow.Millisecond);
         var randomPointValues = new List<double>();
         for (int dimension = 0; dimension < _points[0].DimensionsCount; dimension++)
         {
@@ -150,9 +168,9 @@ public class KMeans<Point> where Point : DataPoint
             
             var min = stat.GetMin();
             var max = stat.GetMax();
-            var rand = random.NextDouble();
+            var rand = _random.NextDouble();
 
-            var value = max * rand + (1 - rand) * min;
+            var value = rand * (max - min) + min;
             randomPointValues.Add(value);
         }
 
@@ -167,11 +185,11 @@ public class KMeans<Point> where Point : DataPoint
         foreach (var point in _points)
         {
             var closestCluster = _clusters[0];
-            var minDistance = double.MaxValue;
+            var minDistance = point.GetDistance(closestCluster.Centroid);
             foreach (var cluster in _clusters)
             {
                 var currentDistance = point.GetDistance(cluster.Centroid);
-                if (currentDistance < minDistance)
+                if (currentDistance <= minDistance)
                 {
                     minDistance = currentDistance;
                     closestCluster = cluster;
@@ -192,7 +210,9 @@ public class KMeans<Point> where Point : DataPoint
             //calculate average for the cluster's slice
             for (int dimension = 0; dimension < cluster.Points[0].DimensionsCount; dimension++)
             {
-                var sliceMean = GetDimensionSlice(cluster.Points, dimension).Average();
+                var slice = GetDimensionSlice(cluster.Points, dimension);
+                var sliceMean = slice.Average();
+                sliceMean = Math.Abs(sliceMean) < 1e-3 ? 0.0 : sliceMean;//by z-score def will be 0 when all points are in the same cluster
                 centroidPoints.Add(sliceMean);
             }
 
