@@ -99,6 +99,24 @@ public class GovernorPoint : DataPoint
     public override string ToString() => $"{StateName}: (longitude: {Longitude}, age: {Age})";
 }
 
+public class Album : DataPoint
+{
+    public string Name { get; }
+    public int Year { get; }
+    public double Length { get; }
+    public int Tracks { get; }
+
+    public Album(string name, int year, double length, int tracks) : base(new []{length, tracks})
+    {
+        Name = name;
+        Year = year;
+        Length = length;
+        Tracks = tracks;
+    }
+
+    public override string ToString() => $"({Name}, {Year})";
+}
+
 public class KMeans<Point> where Point : DataPoint
 {
     private readonly Random _random = new(DateTime.UtcNow.Millisecond);

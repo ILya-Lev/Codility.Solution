@@ -107,4 +107,38 @@ public class KMeansTests
             _output.WriteLine($"Cluster {i}: {string.Join(Environment.NewLine, clusters[i].Points.Select(p => p.ToString()))}");
         }
     }
+
+    [Fact]
+    public void Run_Albums_Observe()
+    {
+        const int k = 3;//as there is expected an eruption (history album is too long)
+        var albums = new List<Album>
+        {
+            new("Got to Be There", 1972, 35.45, 10),
+            new("Ben", 1972, 31.31, 10),
+            new("Music & Me", 1973, 32.09, 10),
+            new("Forever, Michael", 1975, 33.36, 10),
+            new("Off the Wall", 1979, 42.28, 10),
+            new("Thriller", 1982, 42.19, 9),
+            new("Bad", 1987, 48.16, 10),
+            new("Dangerous", 1991, 77.03, 14),
+            new("HIStory: Past, Present and Future, Book I", 1995, 148.58, 30),
+            new("Invincible", 2001, 77.05, 16)
+        };
+
+        var sut = new KMeans<Album>(k, albums);
+        var clusters = sut.Run(100);
+
+        clusters.Count(c => c.Points.Any()).Should().BeGreaterThan(1);
+
+        for (int i = 0; i < clusters.Count; i++)
+        {
+            _output.WriteLine($"Cluster {i} in {clusters[i].Centroid} contains {clusters[i].Points.Count} points");
+        }
+        
+        for (int i = 0; i < clusters.Count; i++)
+        {
+            _output.WriteLine($"Cluster {i}: {string.Join(Environment.NewLine, clusters[i].Points.Select(p => p.ToString()))}");
+        }
+    }
 }
