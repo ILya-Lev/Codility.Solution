@@ -8,6 +8,14 @@ public class Statistics
 
     public double SumUp() => _sequence.Sum();
     public double GetMean() => _sequence.Average();
+    public double GetMedian()
+    {
+        var ascending = _sequence.OrderBy(v => v).ToArray();
+        if (_sequence.Count % 2 != 0) 
+            return ascending[_sequence.Count / 2];
+        return (ascending[_sequence.Count / 2 - 1] + ascending[_sequence.Count / 2]) / 2;
+
+    }
 
     /// <summary>
     /// calculates population dispersion; i.e. in average calculation uses denominator = N
@@ -226,9 +234,9 @@ public class KMeans<Point> where Point : DataPoint
             var centroidPoints = new List<double>();
             
             //calculate average for the cluster's slice
-            for (int dimension = 0; dimension < cluster.Points[0].DimensionsCount; dimension++)
+            for (int dim = 0; dim < cluster.Points[0].DimensionsCount; dim++)
             {
-                var slice = GetDimensionSlice(cluster.Points, dimension);
+                var slice = GetDimensionSlice(cluster.Points, dim);
                 var sliceMean = slice.Average();
                 sliceMean = Math.Abs(sliceMean) < 1e-3 ? 0.0 : sliceMean;//by z-score def will be 0 when all points are in the same cluster
                 centroidPoints.Add(sliceMean);
@@ -238,13 +246,14 @@ public class KMeans<Point> where Point : DataPoint
         }
     }
 
-    private bool AreSetsEqual(IReadOnlyCollection<DataPoint> lhs, IReadOnlyCollection<DataPoint> rhs)
-    {
-        if (lhs.Count != rhs.Count) return false;
-        return lhs
-            .Zip(rhs, (l, r) => l.Dimensions.Zip(r.Dimensions, (v1, v2) => v1.Equals(v2)).All(areSame => areSame))
-            .All(areSame => areSame);
-    }
+    private bool AreSetsEqual(IReadOnlyCollection<DataPoint> lhs
+        , IReadOnlyCollection<DataPoint> rhs)
+        => lhs.Count == rhs.Count
+           && lhs
+               .Zip(rhs, (l, r) => l.Dimensions
+                   .Zip(r.Dimensions, (v1, v2) => v1.Equals(v2))
+                   .All(areSame => areSame))
+               .All(areSame => areSame);
 
     public class Cluster
     {
