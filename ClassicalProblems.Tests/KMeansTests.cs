@@ -126,7 +126,7 @@ public class KMeansTests
             new("Invincible", 2001, 77.05, 16)
         };
 
-        var sut = new KMeans<Album>(k, albums);
+        var sut = new KMedians<Album>(k, albums);
         var clusters = sut.Run(100);
 
         clusters.Count(c => c.Points.Any()).Should().BeGreaterThan(1);

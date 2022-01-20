@@ -142,7 +142,24 @@ public class KMeans<Point> where Point : DataPoint
 
         ZScoreNormalize();
 
-        _clusters = Enumerable.Range(1, k).Select(_ => new Cluster(CreateRandomPoint())).ToList();
+        _clusters = Enumerable.Range(1, k)
+            .Select(_ => CreateRandomPoint())
+            .Select(centroid => new Cluster(centroid))
+            .ToList();
+    }
+
+    public KMeans(IReadOnlyCollection<DataPoint> centroids, IEnumerable<Point> points)
+    {
+        if (centroids.Count < 1)
+            throw new ArgumentException($"Cluster's count has to be above zero; provided {centroids.Count}");
+
+        _points = points.ToArray();
+
+        ZScoreNormalize();
+
+        _clusters = centroids
+            .Select(centroid => new Cluster(centroid))
+            .ToList();
     }
 
     public IReadOnlyList<Cluster> Run(int maxIterations)
@@ -152,9 +169,9 @@ public class KMeans<Point> where Point : DataPoint
             foreach (var cluster in _clusters)
                 cluster.Points.Clear();
 
-            AssignClusters();
+            AssignPointsToClusters();
             var previous = _clusters.Select(c => c.Centroid).ToArray();
-            GenerateCentroids();
+            RedefineCentroids();
             var current = _clusters.Select(c => c.Centroid).ToArray();
             if (AreSetsEqual(previous, current))
                 break;
@@ -206,7 +223,7 @@ public class KMeans<Point> where Point : DataPoint
     private IReadOnlyList<double> GetDimensionSlice(IEnumerable<Point> points, int dimension) => 
         points.Select(p => p.Dimensions[dimension]).ToArray();
 
-    private void AssignClusters()
+    private void AssignPointsToClusters()
     {
         foreach (var point in _points)
         {
@@ -225,25 +242,32 @@ public class KMeans<Point> where Point : DataPoint
         }
     }
 
-    private void GenerateCentroids()
+    private void RedefineCentroids()
     {
         foreach (var cluster in _clusters)
         {
             if (!cluster.Points.Any()) continue;
 
-            var centroidPoints = new List<double>();
+            var centroidCoordinates = new List<double>();
             
             //calculate average for the cluster's slice
             for (int dim = 0; dim < cluster.Points[0].DimensionsCount; dim++)
             {
                 var slice = GetDimensionSlice(cluster.Points, dim);
-                var sliceMean = slice.Average();
-                sliceMean = Math.Abs(sliceMean) < 1e-3 ? 0.0 : sliceMean;//by z-score def will be 0 when all points are in the same cluster
-                centroidPoints.Add(sliceMean);
+                var coordinate = GenerateCentroidDimension(slice);
+                centroidCoordinates.Add(coordinate);
             }
 
-            cluster.Centroid = new DataPoint(centroidPoints);
+            cluster.Centroid = new DataPoint(centroidCoordinates);
         }
+    }
+
+    protected virtual double GenerateCentroidDimension(IReadOnlyList<double> slice)
+    {
+        var sliceMean = slice.Average();
+        return Math.Abs(sliceMean) < 1e-3
+            ? 0.0
+            : sliceMean; //by z-score def will be 0 when all points are in the same cluster
     }
 
     private bool AreSetsEqual(IReadOnlyCollection<DataPoint> lhs
@@ -265,5 +289,23 @@ public class KMeans<Point> where Point : DataPoint
             Centroid = initialCentroid
                        ?? throw new ArgumentNullException(nameof(initialCentroid), "Please provide non null centroid");
         }
+    }
+}
+
+public class KMedians<Point> : KMeans<Point> where Point : DataPoint
+{
+    public KMedians(int k, IEnumerable<Point> points) : base(k, points)
+    {
+    }
+
+    public KMedians(IReadOnlyCollection<DataPoint> centroids, IEnumerable<Point> points) : base(centroids, points)
+    {
+    }
+
+    protected virtual double GenerateCentroidDimension(IReadOnlyList<double> slice)
+    {
+        var stat = new Statistics(slice);
+        var median = stat.GetMedian();
+        return Math.Abs(median) < 1e-3 ? 0.0 : median;
     }
 }
