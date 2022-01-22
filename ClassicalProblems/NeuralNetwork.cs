@@ -2,6 +2,34 @@
 
 public class NeuralNetwork
 {
+    public class Neuron
+    {
+        public double LearningRate { get; }
+        public Func<double, double> ActivationFunction { get; }
+        public Func<double, double> DerivativeActivationFunction { get; }
+     
+        //could setters be private
+        public double[] Weights { get; set; }
+        public double Delta { get; set; }
+        public double OutputCache { get; set; }
+
+        public Neuron(double learningRate
+            , Func<double, double> activationFunction
+            , Func<double, double> derivativeActivationFunction, double[] weights)
+        {
+            LearningRate = learningRate;
+            ActivationFunction = activationFunction;
+            DerivativeActivationFunction = derivativeActivationFunction;
+            Weights = weights;
+        }
+
+        public double CalculateOutput(double[] inputs)
+        {
+            OutputCache = Utils.CalculateDotProduct(Weights, inputs);
+            return ActivationFunction(OutputCache);
+        }
+    }
+
     public static class Utils
     {
         public static double CalculateDotProduct(IReadOnlyList<double> lhs, IReadOnlyList<double> rhs)
