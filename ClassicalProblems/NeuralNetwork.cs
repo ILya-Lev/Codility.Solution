@@ -264,7 +264,7 @@ public class NeuralNetwork
         /// <returns></returns>
         public static IReadOnlyList<TData> LoadCSV<TData, TMap>(string fullFileName)
             where TMap : ClassMap<TData>
-            where TData : IDoubleData
+            where TData : INetworkData
         {
             using var reader = new StreamReader(fullFileName);
             using var csvReader = new CsvReader(reader, new CsvConfiguration(CultureInfo.InvariantCulture)
@@ -297,20 +297,43 @@ public class NeuralNetwork
         }
     }
 
-    public interface IDoubleData
+    public interface INetworkData
     {
         double[] ToDoubleArray();
     }
 
-    public class Irises : IDoubleData
+    public abstract class NetworkDataBase<T> : INetworkData
     {
-        private static readonly IReadOnlyDictionary<string, double[]> _classificationMap =
-            new Dictionary<string, double[]>(StringComparer.OrdinalIgnoreCase)
+        public abstract double[] ToDoubleArray();
+
+        protected static IReadOnlyDictionary<T, double[]> ClassificationMap { get; set; }
+
+        /// <summary> make neural network output understandable by a human </summary>
+        /// <param name="output">has to be an array of 3 numbers, as there are only 3 kinds of irises in the system</param>
+        /// <returns>irises kind name</returns>
+        public static T InterpretOutput(double[] output) => ClassificationMap
+            .Select(p => (Name: p.Key, Score: Utils.GetDotProduct(output, p.Value)))
+            .MaxBy(tuple => tuple.Score)
+            .Name;
+        
+        public static double[] GetExpectedOutput(T kind) => ClassificationMap
+            .TryGetValue(kind, out var vector)
+            ? vector
+            : throw new ArgumentException(
+                $"Unknown wind kind {kind}, supported are {string.Join(", ", ClassificationMap.Select(p => p.Key))}");
+    }
+
+    public class Irises : NetworkDataBase<string>
+    {
+        static Irises()
+        {
+            ClassificationMap = new Dictionary<string, double[]>(StringComparer.OrdinalIgnoreCase)
             {
                 ["Iris-setosa"] = new[] { 1.0, 0, 0 },
                 ["Iris-versicolor"] = new[] { 0, 1.0, 0 },
                 ["Iris-virginica"] = new[] { 0, 0, 1.0 },
             };
+        }
 
         public double LeafLength { get; set; }
         public double LeafWidth { get; set; }
@@ -319,23 +342,9 @@ public class NeuralNetwork
 
         public string Name { get; set; }
 
-        public double[] ToDoubleArray() => new[] { LeafLength, LeafWidth, FlowerLength, FlowerWidth };
+        public override double[] ToDoubleArray() => new[] { LeafLength, LeafWidth, FlowerLength, FlowerWidth };
 
         public override string ToString() => $"{Name}: {LeafLength}, {LeafWidth}, {FlowerLength}, {FlowerWidth}";
-
-        /// <summary> make neural network output understandable by a human </summary>
-        /// <param name="output">has to be an array of 3 numbers, as there are only 3 kinds of irises in the system</param>
-        /// <returns>irises kind name</returns>
-        public static string InterpretOutput(double[] output) => _classificationMap
-            .Select(p => (Name: p.Key, Score: Utils.GetDotProduct(output, p.Value)))
-            .MaxBy(tuple => tuple.Score)
-            .Name;
-
-        public static double[] GetExpectedOutput(string name) => _classificationMap
-            .TryGetValue(name, out var vector)
-            ? vector
-            : throw new ArgumentException(
-                $"Unknown irises kind name {name}, supported are {string.Join(", ", _classificationMap.Select(p => p.Key))}");
     }
 
     public sealed class IrisesMap : ClassMap<Irises>
@@ -355,7 +364,7 @@ public class NeuralNetwork
         public string Name { get; }
         
         public IrisesDataPoint(Irises r)
-        : base(new []{r.LeafLength, r.LeafWidth, r.FlowerLength, r.FlowerWidth})
+        : base(r.ToDoubleArray())
         {
             Name = r.Name;
         }
@@ -400,5 +409,107 @@ public class NeuralNetwork
             .Select(r => Irises.GetExpectedOutput(r.Name)).ToArray();
 
         private string[] ComposeExpectedNames(IReadOnlyCollection<Irises> irises) => irises.Select(r => r.Name).ToArray();
+    }
+    
+    public class Wine : NetworkDataBase<int>
+    {
+        static Wine()
+        {
+            ClassificationMap = new Dictionary<int, double[]>()
+            {
+                [1] = new[] { 1.0, 0, 0 },
+                [2] = new[] { 0, 1.0, 0 },
+                [3] = new[] { 0, 0, 1.0 },
+            };
+        }
+
+        public int Kind { get; set; }
+        public double P1 { get; set; }
+        public double P2 { get; set; }
+        public double P3 { get; set; }
+        public double P4 { get; set; }
+        public double P5 { get; set; }
+        public double P6 { get; set; }
+        public double P7 { get; set; }
+        public double P8 { get; set; }
+        public double P9 { get; set; }
+        public double P10 { get; set; }
+        public double P11 { get; set; }
+        public double P12 { get; set; }
+        public double P13 { get; set; }
+
+        public override double[] ToDoubleArray() => new[] { P1,P2,P3,P4,P5,P6,P7,P8,P9,P10,P11,P12,P13 };
+
+        public override string ToString() => $"{Kind}: {P1} {P2} {P3} {P4} {P5} {P6} {P7} {P8} {P9} {P10} {P11} {P12} {P13}";
+    }
+
+    public sealed class WineMap : ClassMap<Wine>
+    {
+        public WineMap()
+        {
+            Map(w => w.Kind);
+            Map(w => w.P1);
+            Map(w => w.P2);
+            Map(w => w.P3);
+            Map(w => w.P4);
+            Map(w => w.P5);
+            Map(w => w.P6);
+            Map(w => w.P7);
+            Map(w => w.P8);
+            Map(w => w.P9);
+            Map(w => w.P10);
+            Map(w => w.P11);
+            Map(w => w.P12);
+            Map(w => w.P13);
+        }
+    }
+
+    public class WineDataPoint : DataPoint
+    {
+        public int Kind { get; }
+     
+        public WineDataPoint(Wine w)
+        :base(w.ToDoubleArray())
+        {
+            Kind = w.Kind;
+        }
+
+        public override string ToString() => $"{Kind}: {base.ToString()}";
+    }
+
+    public class WineClassification
+    {
+        public Results Classify(IReadOnlyList<Wine> wine)
+        {
+            var network = new NeuralNetwork(new[] { 13, 7, 3 }
+                , 0.9
+                , Utils.GetSigmoidFor
+                , Utils.GetSigmoidDerivativeFor);
+
+            var shuffled = Utils.Shuffle(wine);
+            var trainingSetCount = wine.Count * 9 / 10;
+            var trainingSet = shuffled.Take(trainingSetCount).ToArray();
+
+            var trainInputs = ComposeInputs(trainingSet);
+            var trainExpectations = ComposeExpectedDoubles(trainingSet);
+            for (int i = 0; i < 10; i++)
+            {
+                network.Train(trainInputs, trainExpectations);
+            }
+
+            var checkSet = shuffled.Skip(trainingSetCount).ToArray();
+            var checkInputs = ComposeInputs(checkSet);
+            var expectedNames = ComposeExpectedKinds(checkSet);
+            var result = network.Validate(checkInputs, expectedNames, Wine.InterpretOutput);
+
+            return result;
+        }
+
+        private double[][] ComposeInputs(IReadOnlyCollection<Wine> wine) => wine.Select(r => r.ToDoubleArray()).ToArray();
+
+        private double[][] ComposeExpectedDoubles(IReadOnlyCollection<Wine> wine) => wine
+            .Select(r => Wine.GetExpectedOutput(r.Kind)).ToArray();
+
+        private int[] ComposeExpectedKinds(IReadOnlyCollection<Wine> wine) => wine.Select(r => r.Kind).ToArray();
     }
 }

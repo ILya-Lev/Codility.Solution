@@ -47,4 +47,18 @@ public class NeuralNetworkIrisTests
         result.Should().NotBeNull();
         _output.WriteLine($"{result.Correct} correct out of {result.Trials} = {result.Percentage:N2}");
     }
+
+    [Fact]
+    public void WineClassification_Classify_90PercentPrecision()
+    {
+        //typical results: 4-10 out of 18 are correct (i.e. 0.22 - 0.55 correctness rate) - compare with kMeans
+
+        var path = Path.Combine(Directory.GetCurrentDirectory(), @"data\wine.csv");
+        var wine = NeuralNetwork.Utils.LoadCSV<NeuralNetwork.Wine, NeuralNetwork.WineMap>(path);
+
+        var result = new NeuralNetwork.WineClassification().Classify(wine);
+
+        result.Should().NotBeNull();
+        _output.WriteLine($"{result.Correct} correct out of {result.Trials} = {result.Percentage:N2}");
+    }
 }

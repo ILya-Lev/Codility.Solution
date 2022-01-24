@@ -169,6 +169,32 @@ public class KMeansTests
             _output.WriteLine($"Cluster {i}: {string.Join(Environment.NewLine, clusters[i].Points.Select(p => p.ToString()))}");
         }
     }
+    
+    [Fact]
+    public void Run_Wine_Observe()
+    {
+        //typical result: kind#1 59 out of 59 with 3 of kind#2 in the same cluster - 0.95;
+        //kind#2 65 out of 71 in the same cluster - 0.92;
+        //kind#3 49 out of 51 in the same cluster together with 3 of kind#2 - 0.96;
+        //the classification is much better than one done with neural network....
 
+        const int k = 3;//as there are 3 expected kinds of Wine in the system
+        var path = Path.Combine(Directory.GetCurrentDirectory(), @"data\wine.csv");
+        var wine = NeuralNetwork.Utils.LoadCSV<NeuralNetwork.Wine, NeuralNetwork.WineMap>(path);
 
+        var sut = new KMeans<NeuralNetwork.WineDataPoint>(k, wine.Select(w => new NeuralNetwork.WineDataPoint(w)));
+        var clusters = sut.Run(100);
+
+        clusters.Count(c => c.Points.Any()).Should().BeGreaterThan(1);
+
+        for (int i = 0; i < clusters.Count; i++)
+        {
+            _output.WriteLine($"Cluster {i} in {clusters[i].Centroid} contains {clusters[i].Points.Count} points");
+        }
+        
+        for (int i = 0; i < clusters.Count; i++)
+        {
+            _output.WriteLine($"Cluster {i}: {string.Join(Environment.NewLine, clusters[i].Points.Select(p => p.ToString()))}");
+        }
+    }
 }
