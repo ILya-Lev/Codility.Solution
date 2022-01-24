@@ -72,7 +72,7 @@ public class NeuralNetwork
             }
         }
 
-        public Results Valdate<T>(double[][] inputs, T[] expected, Func<double[], T> interpret)
+        public Results Validate<T>(double[][] inputs, T[] expected, Func<double[], T> interpret)
         {
             var correctCounter = 0;
             for (int i = 0; i < inputs.Length; i++)
