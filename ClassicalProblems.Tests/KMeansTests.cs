@@ -1,6 +1,7 @@
 ﻿using FluentAssertions;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using Xunit;
 using Xunit.Abstractions;
@@ -141,4 +142,33 @@ public class KMeansTests
             _output.WriteLine($"Cluster {i}: {string.Join(Environment.NewLine, clusters[i].Points.Select(p => p.ToString()))}");
         }
     }
+
+    [Fact]
+    public void Run_Irises_Observe()
+    {
+        //typical result: Iris-setosa 49 out of 50 in the same cluster - 0.98;
+        //Iris-versicolor 37 out of 50 in the same cluster together with 1 Iris-setosa and 8 Iris-virginica - 0.74;
+        //Iris-virginica 42 out of 50 in the same cluster together with 13 Iris-versicolor - 0.84;
+
+        const int k = 3;//as there are 3 expected kinds of Irises in the system
+        var path = Path.Combine(Directory.GetCurrentDirectory(), @"data\iris.csv");
+        var irises = NeuralNetwork.Utils.LoadCSV<NeuralNetwork.Irises, NeuralNetwork.IrisesMap>(path);
+
+        var sut = new KMeans<NeuralNetwork.IrisesDataPoint>(k, irises.Select(r => new NeuralNetwork.IrisesDataPoint(r)));
+        var clusters = sut.Run(100);
+
+        clusters.Count(c => c.Points.Any()).Should().BeGreaterThan(1);
+
+        for (int i = 0; i < clusters.Count; i++)
+        {
+            _output.WriteLine($"Cluster {i} in {clusters[i].Centroid} contains {clusters[i].Points.Count} points");
+        }
+        
+        for (int i = 0; i < clusters.Count; i++)
+        {
+            _output.WriteLine($"Cluster {i}: {string.Join(Environment.NewLine, clusters[i].Points.Select(p => p.ToString()))}");
+        }
+    }
+
+
 }

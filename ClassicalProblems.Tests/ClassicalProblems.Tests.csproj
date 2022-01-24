@@ -27,4 +27,13 @@
     <ProjectReference Include="..\ClassicalProblems\ClassicalProblems.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="data\iris.csv">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="data\wine.csv">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>
