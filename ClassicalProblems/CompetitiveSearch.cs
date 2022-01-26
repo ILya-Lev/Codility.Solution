@@ -2,7 +2,7 @@
 
 namespace ClassicalProblems;
 
-public class CompetitionalSearch
+public static class CompetitiveSearch
 {
     public interface IPiece { IPiece GetOpposite(); }
 
@@ -28,7 +28,8 @@ public class CompetitionalSearch
         {
             TMove bestMove = default;
             var bestEvaluation = double.MinValue;
-            foreach (var move in board.GetLegalMoves())
+            var moves = board.GetLegalMoves();
+            foreach (var move in moves)
             {
                 var evaluation = MiniMaxDepthSearch(board.Move(move), false, board.GetTurn(), maxDepth);
                 if (evaluation > bestEvaluation)
@@ -49,26 +50,17 @@ public class CompetitionalSearch
             if (board.IsWin() || board.IsDraw() || remainingDepth == 0)
                 return board.Evaluate(originalPlayer);
 
-            if (isMaximizing)
-            {
-                var bestEvaluation = double.MinValue;
-                foreach (var move in board.GetLegalMoves())
-                {
-                    var evaluation = MiniMaxDepthSearch(board.Move(move), !isMaximizing, originalPlayer, remainingDepth - 1);
-                    bestEvaluation = Math.Max(bestEvaluation, evaluation);
-                }
-
-                return bestEvaluation;
-            }
-
-            var worstEvaluation = double.MaxValue;
-            foreach (var move in board.GetLegalMoves())
+            var moves = board.GetLegalMoves();
+            
+            var finalScore = isMaximizing ? double.MinValue : double.MaxValue;
+            foreach (var move in moves)
             {
                 var evaluation = MiniMaxDepthSearch(board.Move(move), !isMaximizing, originalPlayer, remainingDepth - 1);
-                worstEvaluation = Math.Min(worstEvaluation, evaluation);
+                finalScore = isMaximizing 
+                    ? Math.Max(finalScore, evaluation)
+                    : Math.Min(finalScore, evaluation);
             }
-
-            return worstEvaluation;
+            return finalScore;
         }
     }
 
@@ -121,37 +113,18 @@ public class CompetitionalSearch
             return new TicTacToeBoard(nextPositions, _turn.GetOpposite() as TicTacToePiece);
         }
 
-        public IReadOnlyList<int> GetLegalMoves() => _positions
-            .Select((p, i) => (p, i))
-            .Where(t => t.p == TicTacToePiece.E)
-            .Select(t => t.i).ToArray();
-
-        public bool IsWin()
+        public IReadOnlyList<int> GetLegalMoves()
         {
-            var rowMatch = _positions.Select((p, i) => (p, i))
-                .GroupBy(t => t.i / 3, t => t.p)                    //group cells of the same row
-                .Select(g => g.All(p => p == _turn))
-                .Any(g => g);
+            if (IsWin())
+                return Array.Empty<int>();
 
-            if (rowMatch) return true;
-
-            var colMatch = _positions.Select((p, i) => (p, i))
-                .GroupBy(t => t.i % 3, t => t.p)                    //group cells of the same col
-                .Select(g => g.All(p => p == _turn))
-                .Any(g => g);
-
-            if (colMatch) return true;
-
-            var mainDiagonalMatch = new[] { 0, 4, 8 }.All(i => _positions[i] == _turn);
-            if (mainDiagonalMatch)
-                return true;
-
-            var secondaryDiagonalMatch = new[] { 2, 4, 6 }.All(i => _positions[i] == _turn);
-            if (secondaryDiagonalMatch)
-                return true;
-
-            return false;
+            return _positions
+                .Select((p, i) => (p, i))
+                .Where(t => t.p == TicTacToePiece.E)
+                .Select(t => t.i).ToArray();
         }
+
+        public bool IsWin() => CheckIfPlayerWins(_turn) || CheckIfPlayerWins(_turn.GetOpposite() as TicTacToePiece);
 
         public double Evaluate(IPiece player)
         {
@@ -178,6 +151,33 @@ public class CompetitionalSearch
             }
 
             return sb.ToString();
+        }
+
+        private bool CheckIfPlayerWins(TicTacToePiece player)
+        {
+            var rowMatch = _positions.Select((p, i) => (p, i))
+                .GroupBy(t => t.i / 3, t => t.p) //group cells of the same row
+                .Select(g => g.All(p => p == player))
+                .Any(g => g);
+
+            if (rowMatch) return true;
+
+            var colMatch = _positions.Select((p, i) => (p, i))
+                .GroupBy(t => t.i % 3, t => t.p) //group cells of the same col
+                .Select(g => g.All(p => p == player))
+                .Any(g => g);
+
+            if (colMatch) return true;
+
+            var mainDiagonalMatch = new[] { 0, 4, 8 }.All(i => _positions[i] == player);
+            if (mainDiagonalMatch)
+                return true;
+
+            var secondaryDiagonalMatch = new[] { 2, 4, 6 }.All(i => _positions[i] == player);
+            if (secondaryDiagonalMatch)
+                return true;
+
+            return false;
         }
     }
 }
