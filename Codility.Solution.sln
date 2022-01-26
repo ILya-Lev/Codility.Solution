@@ -25,9 +25,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Algorithms.Solutions", "Alg
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Algorithms.Tests", "Algorithms.Tests\Algorithms.Tests.csproj", "{E13993A8-01FD-4F1A-BF37-4C9C84376F91}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClassicalProblems", "ClassicalProblems\ClassicalProblems.csproj", "{C750CB1D-48E0-40C6-B4FE-DE402901C228}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ClassicalProblems", "ClassicalProblems\ClassicalProblems.csproj", "{C750CB1D-48E0-40C6-B4FE-DE402901C228}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClassicalProblems.Tests", "ClassicalProblems.Tests\ClassicalProblems.Tests.csproj", "{06D5DE1C-CE04-4054-9423-21A9C10C1F18}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ClassicalProblems.Tests", "ClassicalProblems.Tests\ClassicalProblems.Tests.csproj", "{06D5DE1C-CE04-4054-9423-21A9C10C1F18}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TicTacToe", "TicTacToe\TicTacToe.csproj", "{F3F897B0-2036-4808-8ABC-84BD723F3B35}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -87,6 +89,10 @@ Global
 		{06D5DE1C-CE04-4054-9423-21A9C10C1F18}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{06D5DE1C-CE04-4054-9423-21A9C10C1F18}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{06D5DE1C-CE04-4054-9423-21A9C10C1F18}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F3F897B0-2036-4808-8ABC-84BD723F3B35}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F3F897B0-2036-4808-8ABC-84BD723F3B35}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F3F897B0-2036-4808-8ABC-84BD723F3B35}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F3F897B0-2036-4808-8ABC-84BD723F3B35}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -130,6 +130,7 @@ public static class CompetitiveSearch
         {
             if (!IsWin()) return 0;
 
+            //-1 if _turn == player as the method is called for the opposite player when the original one has just won
             return _turn == player ? -1 : 1;
         }
 
