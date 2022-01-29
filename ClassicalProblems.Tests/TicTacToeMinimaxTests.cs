@@ -26,7 +26,7 @@ public class TicTacToeMiniMaxTests
         };
         var board = new TicTacToeBoard(positions, TicTacToePiece.X);
 
-        var winningPosition = MiniMax.FindBestMove(board, 8);
+        var winningPosition = Solver<int>.FindBestMoveMiniMax(board, 8);
 
         winningPosition.Should().Be(6);
     }
@@ -42,7 +42,7 @@ public class TicTacToeMiniMaxTests
         };
         var board = new TicTacToeBoard(positions, TicTacToePiece.X);
 
-        var winningPosition = MiniMax.FindBestMove(board, 8);
+        var winningPosition = Solver<int>.FindBestMoveMiniMax(board, 8);
 
         winningPosition.Should().Be(2);
     }
@@ -58,7 +58,7 @@ public class TicTacToeMiniMaxTests
         };
         var board = new TicTacToeBoard(positions, TicTacToePiece.X);
 
-        var winningPosition = MiniMax.FindBestMove(board, 8);
+        var winningPosition = Solver<int>.FindBestMoveMiniMax(board, 8);
 
         winningPosition.Should().BeOneOf(new[] { 1, 4 });
         _output.WriteLine($"winning move is {winningPosition}");

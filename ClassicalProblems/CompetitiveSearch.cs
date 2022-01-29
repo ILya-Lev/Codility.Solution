@@ -23,16 +23,28 @@ public static class CompetitiveSearch
         double Evaluate(IPiece player);
     }
 
-    public static class MiniMax
+    //todo: think over memoization technique to increase performance
+    public static class Solver<TMove>
     {
-        public static TMove FindBestMove<TMove>(IBoard<TMove> board, int maxDepth)
+        public static TMove FindBestMoveMiniMax(IBoard<TMove> board, int maxDepth)
+        {
+            return DoFindBestMove(board, (b, p) => MiniMaxDepthSearch(b, false, p, maxDepth));
+        }
+
+        public static TMove FindBestMoveAlphaBeta(IBoard<TMove> board, int maxDepth)
+        {
+            return DoFindBestMove(board
+                , (b, p) => AlphaBetaDepthSearch(b, false, p, maxDepth, double.MinValue, double.MaxValue));
+        }
+
+        private static TMove DoFindBestMove(IBoard<TMove> board, Func<IBoard<TMove>, IPiece, double> getBestScore)
         {
             TMove bestMove = default;
             var bestEvaluation = double.MinValue;
             var moves = board.GetLegalMoves();
             foreach (var move in moves)
             {
-                var evaluation = MiniMaxDepthSearch(board.Move(move), false, board.GetTurn(), maxDepth);
+                var evaluation = getBestScore(board.Move(move), board.GetTurn());
                 if (evaluation > bestEvaluation)
                 {
                     bestEvaluation = evaluation;
@@ -42,8 +54,8 @@ public static class CompetitiveSearch
 
             return bestMove;
         }
-
-        private static double MiniMaxDepthSearch<TMove>(IBoard<TMove> board
+        
+        private static double MiniMaxDepthSearch(IBoard<TMove> board
             , bool isMaximizing
             , IPiece originalPlayer
             , int remainingDepth)
@@ -62,6 +74,38 @@ public static class CompetitiveSearch
                     : Math.Min(finalScore, evaluation);
             }
             return finalScore;
+        }
+    
+        private static double AlphaBetaDepthSearch(IBoard<TMove> board, bool isMaximizing, IPiece originalPlayer, int maxDepth
+            , double alpha, double beta)
+        {
+            if (board.IsWin() || board.IsDraw() || maxDepth <= 0)
+                return board.Evaluate(originalPlayer);
+
+            if (isMaximizing)
+            {
+                foreach (var move in board.GetLegalMoves())
+                {
+                    alpha = Math.Max(alpha,
+                        AlphaBetaDepthSearch(board.Move(move), !isMaximizing, originalPlayer, maxDepth - 1, alpha, beta));
+                    if (beta <= alpha)//this branch won't give better result
+                        break;
+                }
+
+                return alpha;
+            }
+            else
+            {
+                foreach (var move in board.GetLegalMoves())
+                {
+                    beta = Math.Min(beta,
+                        AlphaBetaDepthSearch(board.Move(move), !isMaximizing, originalPlayer, maxDepth - 1, alpha, beta));
+                    if (beta <= alpha)//this branch won't give better result
+                        break;
+                }
+
+                return beta;
+            }
         }
     }
 
@@ -285,12 +329,21 @@ public static class CompetitiveSearch
                 for (int col = 0; col < Width; col++)
                 {
                     var location = row * Width + col;
-                    sb.Append(_positions[location].ToString());
+                    sb.Append(_positions[location]);
                     sb.Append("|");
                 }
 
                 sb.AppendLine();
             }
+
+            //print col indexes
+            for (int col = 0; col < Width; col++)
+            {
+                sb.Append(col);
+                sb.Append("|");
+            }
+
+            sb.AppendLine();
 
             return sb.ToString();
         }

@@ -51,7 +51,7 @@ public class Program
         return location;
     }
 
-    private static int DoComputerMove(TicTacToeBoard board) => MiniMax.FindBestMove(board, 9);
+    private static int DoComputerMove(TicTacToeBoard board) => Solver<int>.FindBestMoveMiniMax(board, 9);
 
     private static void PrintResult(int moveNumber, TicTacToeBoard board, TicTacToePiece human)
     {

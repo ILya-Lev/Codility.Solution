@@ -21,6 +21,9 @@ public class Program
             var location = board.GetTurn() == human
                 ? DoHumanMove(board, human)
                 : DoComputerMove(board);
+         
+            Console.WriteLine($"the move is to put {board.GetTurn()} into column {location}");
+
             moveNumber++;
             board = board.Move(location) as ConnectFourBoard;
         }
@@ -51,7 +54,7 @@ public class Program
         return location;
     }
 
-    private static int DoComputerMove(ConnectFourBoard board) => MiniMax.FindBestMove(board, 5);
+    private static int DoComputerMove(ConnectFourBoard board) => Solver<int>.FindBestMoveAlphaBeta(board, 6);
 
     private static void PrintResult(int moveNumber, ConnectFourBoard board, ConnectFourPiece human)
     {
