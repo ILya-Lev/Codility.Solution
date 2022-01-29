@@ -29,7 +29,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ClassicalProblems", "Classi
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ClassicalProblems.Tests", "ClassicalProblems.Tests\ClassicalProblems.Tests.csproj", "{06D5DE1C-CE04-4054-9423-21A9C10C1F18}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TicTacToe", "TicTacToe\TicTacToe.csproj", "{F3F897B0-2036-4808-8ABC-84BD723F3B35}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TicTacToe", "TicTacToe\TicTacToe.csproj", "{F3F897B0-2036-4808-8ABC-84BD723F3B35}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConnectFour", "ConnectFour\ConnectFour.csproj", "{5A54291D-C771-4FBE-9418-2BFDB564A239}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Games", "Games", "{AD203C3C-607F-4DBA-8783-D748173E58E3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -93,9 +97,17 @@ Global
 		{F3F897B0-2036-4808-8ABC-84BD723F3B35}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F3F897B0-2036-4808-8ABC-84BD723F3B35}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F3F897B0-2036-4808-8ABC-84BD723F3B35}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5A54291D-C771-4FBE-9418-2BFDB564A239}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5A54291D-C771-4FBE-9418-2BFDB564A239}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5A54291D-C771-4FBE-9418-2BFDB564A239}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5A54291D-C771-4FBE-9418-2BFDB564A239}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{F3F897B0-2036-4808-8ABC-84BD723F3B35} = {AD203C3C-607F-4DBA-8783-D748173E58E3}
+		{5A54291D-C771-4FBE-9418-2BFDB564A239} = {AD203C3C-607F-4DBA-8783-D748173E58E3}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {7A20C9ED-DC05-4812-93A2-813861F04B0E}
