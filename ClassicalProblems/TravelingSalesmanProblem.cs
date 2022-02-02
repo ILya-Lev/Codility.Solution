@@ -50,6 +50,37 @@ public class TravelingSalesmanProblem
     //    _distances = distances;
     //}
 
+    public Path GetShortestPathByPermutations(string origin)
+    {
+        var towns = _distances.Keys.ToArray();
+        
+        var path = GenerateAllPermutations(towns)
+            .Where(p => p[0].Equals(origin, StringComparison.OrdinalIgnoreCase))
+            .MinBy(GetTotalDistance)!;
+
+        return new Path()
+        {
+            Towns = path,
+            TotalDistance = GetTotalDistance(path)
+        };
+    }
+
+    private int GetTotalDistance(string[] path)
+    {
+        var total = 0;
+        for (int i = 0; i < path.Length-1; i++)
+        {
+            var departureTown = path[i];
+            var arrivalTown = path[i+1];
+            total += _distances[departureTown][arrivalTown];
+        }
+
+        //return back
+        total += _distances[path.Last()][path.First()];
+
+        return total;
+    }
+
     public static IReadOnlyList<T[]> GenerateAllPermutations<T>(T[] sequence)
     {
         var storage = new List<T[]>();
@@ -74,5 +105,13 @@ public class TravelingSalesmanProblem
 
             (tmp[endIndex], tmp[i]) = (tmp[i], tmp[endIndex]);
         }
+    }
+
+    public class Path
+    {
+        public string[] Towns { get; set; }
+        public int TotalDistance { get; set; }
+
+        public override string ToString() => $"path: {string.Join("->", Towns)}, total distance: {TotalDistance}";
     }
 }
