@@ -111,7 +111,7 @@ public static class CompetitiveSearch
 
     public class TicTacToePiece : IPiece
     {
-        public static TicTacToePiece E { get; } = new();
+        public static TicTacToePiece E { get; } = new(" ");
         public static TicTacToePiece X { get; } = new("X");
         public static TicTacToePiece O { get; } = new("O");
 
