@@ -1,7 +1,5 @@
-﻿using System;
-using System.Dynamic;
+﻿using FluentAssertions;
 using System.Linq;
-using FluentAssertions;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -10,11 +8,7 @@ namespace ClassicalProblems.Tests;
 public class PhoneNumberMnemonicsTests
 {
     private readonly ITestOutputHelper _output;
-
-    public PhoneNumberMnemonicsTests(ITestOutputHelper output)
-    {
-        _output = output;
-    }
+    public PhoneNumberMnemonicsTests(ITestOutputHelper output) => _output = output;
 
     [Fact]
     public void GenerateLetterCombinations_Number_AllCombinations()
@@ -32,7 +26,16 @@ public class PhoneNumberMnemonicsTests
         var sut = new PhoneNumberMnemonics(new[] { "apple", "fruit", "grape", "pickle" });
         var combinations = sut.GenerateWords("27753");//3^3*4^2 = 432
      
-        combinations.Should().HaveCount(1);//only one match = apple
         combinations.Single().Should().Be("apple");
+    }
+
+    [Fact]
+    public void GenerateWords_69_27753_MyApple()
+    {
+        var sut = new PhoneNumberMnemonics(new[] { "apple", "my", "me", "we", "it", "is", "fruit", "grape", "pickle" });
+        
+        var combinations = sut.GenerateWords("69-27753");
+        
+        combinations.First().Should().Be("my-apple");
     }
 }

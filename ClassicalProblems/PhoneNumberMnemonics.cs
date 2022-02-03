@@ -6,24 +6,33 @@ public class PhoneNumberMnemonics
 
     private static readonly IReadOnlyDictionary<int, IReadOnlyList<char>> _symbolsByDigit = new Dictionary<int, IReadOnlyList<char>>
     {
-        [0] = new []{'0'},
-        [1] = new []{'1'},
-        [2] = new []{'a','b','c'},
-        [3] = new []{'d','e','f'},
-        [4] = new []{'g','h','i'},
-        [5] = new []{'j','k','l'},
-        [6] = new []{'m','n','o'},
-        [7] = new []{'p','q','r', 's'},
-        [8] = new []{'t','u','v'},
-        [9] = new []{'w','x','y', 'z'},
+        [0] = new[] { '0' },
+        [1] = new[] { '1' },
+        [2] = new[] { 'a', 'b', 'c' },
+        [3] = new[] { 'd', 'e', 'f' },
+        [4] = new[] { 'g', 'h', 'i' },
+        [5] = new[] { 'j', 'k', 'l' },
+        [6] = new[] { 'm', 'n', 'o' },
+        [7] = new[] { 'p', 'q', 'r', 's' },
+        [8] = new[] { 't', 'u', 'v' },
+        [9] = new[] { 'w', 'x', 'y', 'z' },
     };
+
+    private readonly int _scoreThreshold = 4;
 
     public PhoneNumberMnemonics(IReadOnlyList<string> knownWords) => _knownWords = new HashSet<string>(knownWords);
 
     public IReadOnlyList<string> GenerateWords(string number)
     {
         var letterCombinations = GenerateLetterCombinations(number);
-        var words = letterCombinations.Where(c => _knownWords.Contains(c)).ToArray();
+        var words = letterCombinations
+            .Select(combination => (combination, CalculateScore(combination)))
+            .Where(tuple => tuple.Item2 > _scoreThreshold)
+            .OrderByDescending(tuple => tuple.Item2)
+            .Select(tuple => tuple.Item1)
+            .Distinct()
+            .ToArray();
+
         return words;
     }
 
@@ -34,11 +43,29 @@ public class PhoneNumberMnemonics
         return letterCombinations;
     }
 
+    private int CalculateScore(string combination, int start = 0, int scoreSoFar = 0)
+    {
+        int score = scoreSoFar;
+        for (int currentStart = start; currentStart < combination.Length - 1; currentStart++)
+        {
+            for (int end = currentStart + 1; end < combination.Length; end++)
+            {
+                var candidate = combination.Substring(currentStart, end - currentStart + 1);
+                if (!_knownWords.Contains(candidate))
+                    continue;
+                
+                var currentScore = CalculateScore(combination, end + 1, scoreSoFar + candidate.Length);
+                if (currentScore > score)
+                    score = currentScore;
+            }
+        }
+        return score;
+    }
 
     private static Node BuildSearchTree(string number)
     {
         var searchTree = new Node() { Symbol = null };
-        
+
         var layer = new List<Node>() { searchTree };
         foreach (var letter in number)
         {
