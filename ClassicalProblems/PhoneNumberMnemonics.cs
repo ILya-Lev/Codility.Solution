@@ -37,6 +37,32 @@ public class PhoneNumberMnemonics
         return words;
     }
 
+    public static IReadOnlyList<string> GenerateSpanCombinations(string number)
+    {
+        var spans = new List<char[]> { new char[number.Length] };
+        for (int i = 0; i < number.Length; i++)
+        {
+            var options = new[] { number[i] };
+            options = char.IsDigit(number[i])
+                ? _symbolsByDigit[int.Parse(new string(options))].ToArray()
+                : options;
+
+            var currentSpans = spans.ToArray();
+            spans.Clear();
+            foreach (var letter in options)
+            {
+                foreach (var span in currentSpans)
+                {
+                    var tmp = span.ToArray();
+                    tmp[i] = letter;
+                    spans.Add(tmp);
+                }
+            }
+        }
+
+        return spans.Select(s => new string(s)).ToArray();
+    }
+
     public static IReadOnlyList<string> GenerateLetterCombinations(string number)
     {
         var searchTree = BuildSearchTree(number);

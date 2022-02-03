@@ -21,6 +21,16 @@ public class PhoneNumberMnemonicsTests
     }
 
     [Fact]
+    public void GenerateSpanCombinations_Number_AllCombinations()
+    {
+        var combinations = PhoneNumberMnemonics.GenerateSpanCombinations("0854723118");//4*3^6 = 2916 combinations
+     
+        combinations.Should().HaveCount(2916);
+        foreach (var combination in combinations.Take(9))
+            _output.WriteLine(combination);
+    }
+
+    [Fact]
     public void GenerateWords_27753_Apple()
     {
         var sut = new PhoneNumberMnemonics(new[] { "apple", "fruit", "grape", "pickle" });
