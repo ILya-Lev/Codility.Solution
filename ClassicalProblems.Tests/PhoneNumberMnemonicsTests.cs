@@ -38,4 +38,14 @@ public class PhoneNumberMnemonicsTests
         
         combinations.First().Should().Be("my-apple");
     }
+
+    [Fact]
+    public void GenerateWords_1440787_Ghosts()
+    {
+        var sut = new PhoneNumberMnemonics(new[] { "apple", "my", "me", "we", "it", "is", "fruit", "grape", "pickle", "ghost", "ghosts" });
+        
+        var combinations = sut.GenerateWords("1440787");
+        
+        combinations.First().Should().Be("1gh0sts");
+    }
 }

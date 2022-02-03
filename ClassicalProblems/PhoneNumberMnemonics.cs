@@ -6,7 +6,7 @@ public class PhoneNumberMnemonics
 
     private static readonly IReadOnlyDictionary<int, IReadOnlyList<char>> _symbolsByDigit = new Dictionary<int, IReadOnlyList<char>>
     {
-        [0] = new[] { '0' },
+        [0] = new[] { 'o' },
         [1] = new[] { '1' },
         [2] = new[] { 'a', 'b', 'c' },
         [3] = new[] { 'd', 'e', 'f' },
@@ -31,6 +31,7 @@ public class PhoneNumberMnemonics
             .OrderByDescending(tuple => tuple.Item2)
             .Select(tuple => tuple.Item1)
             .Distinct()
+            .Select(combination => RestoreZeroCharacter(combination, number))
             .ToArray();
 
         return words;
@@ -60,6 +61,20 @@ public class PhoneNumberMnemonics
             }
         }
         return score;
+    }
+
+    private static string RestoreZeroCharacter(string combination, string number)
+    {
+        if (number.All(c => c != '0')) return combination;
+
+        var letters = combination.ToCharArray();
+        for (int i = 0; i < number.Length; i++)
+        {
+            if (number[i] == '0' && letters[i] == 'o')
+                letters[i] = '0';
+        }
+        
+        return new string(letters);
     }
 
     private static Node BuildSearchTree(string number)
