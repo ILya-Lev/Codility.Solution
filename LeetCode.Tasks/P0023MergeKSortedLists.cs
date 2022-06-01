@@ -50,6 +50,35 @@ public static class P0023MergeKSortedLists
         }
     }
 
+    public static ListNode MergeKListsPriority(ListNode[] lists)
+    {
+        if (lists is null || lists.Count(n => n != null) == 0)
+            return null;
+        
+        var head = new ListNode();
+        var current = head;
+        ListNode last = null;
+        
+        var queue = new PriorityQueue<ListNode, int>(lists.Where(n => n != null).Select(n => (n, n.val)));
+        while (queue.Count > 0)
+        {
+            var node = queue.Dequeue();
+            current.val = node.val;
+            if (node.next != null)
+                queue.Enqueue(node.next, node.next.val);
+
+            last = current;
+            current.next = new ListNode();
+            current = current.next;
+        }
+
+        if (last?.next == current)
+            last!.next = null;
+            
+        return head;
+    }
+
+
     /// <summary>
     /// as all lists are already sorted, one has to consider only current heads of all lists
     /// sort heads

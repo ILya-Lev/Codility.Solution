@@ -26,7 +26,7 @@ public class P0023MergeKSortedListsTests
             P0023MergeKSortedLists.ListNode.FromSequence(new[] { 2, 6 }),
         };
 
-        var result = P0023MergeKSortedLists.MergeKLists(lists);
+        var result = P0023MergeKSortedLists.MergeKListsPriority(lists);
 
         var sequence = P0023MergeKSortedLists.ListNode.ToSequence(result);
 
@@ -44,7 +44,7 @@ public class P0023MergeKSortedListsTests
             P0023MergeKSortedLists.ListNode.FromSequence(new[] { -2, -1, 0, 2 }),
         };
 
-        var result = P0023MergeKSortedLists.MergeKLists(lists);
+        var result = P0023MergeKSortedLists.MergeKListsPriority(lists);
 
         var sequence = P0023MergeKSortedLists.ListNode.ToSequence(result);
 
