@@ -50,6 +50,18 @@ public static class P0023MergeKSortedLists
         }
     }
 
+    /// <summary>
+    /// as all lists are already sorted, one has to consider only current heads of all lists
+    /// sort heads
+    /// take top  - it's a min by def, but as values are not unique - traverse until you find next value above min
+    /// for each min item advance head by one
+    /// remove nulls
+    /// maintain heads in the ascending order - invariant of the algorithm
+    /// to maintain heads sorted, handle only former top min items,
+    /// i.e. there is no need to sort all heads, only ones which were advanced
+    /// </summary>
+    /// <param name="lists"></param>
+    /// <returns></returns>
     public static ListNode MergeKLists(ListNode[] lists)
     {
         if (lists is null || lists.Length == 0)
