@@ -5,51 +5,6 @@ namespace LeetCode.Tasks;
 
 public static class P0023MergeKSortedLists
 {
-    public class ListNode
-    {
-        public int val;
-        public ListNode next;
-        public ListNode(int val = 0, ListNode next = null)
-        {
-            this.val = val;
-            this.next = next;
-        }
-
-        public override string ToString()
-        {
-            var isLast = next is null ? 'L' : ' ';
-            return $"{val} {isLast}".Trim();
-        }
-
-        public static ListNode FromSequence(IEnumerable<int> sequence)
-        {
-            var result = new ListNode();
-            var current = result;
-            ListNode last = null;
-            
-            foreach (var n in sequence)
-            {
-                current.val = n;
-                current.next = new ListNode();
-                last = current;
-                current = current.next;
-            }
-
-            if (last?.next == current)
-                last!.next = null;
-            
-            return result;
-        }
-
-        public static IReadOnlyList<int> ToSequence(ListNode head)
-        {
-            var result = new List<int>();
-            for (var current = head; current != null; current = current.next)
-                result.Add(current.val);
-            return result;
-        }
-    }
-
     public static ListNode MergeKListsPriority(ListNode[] lists)
     {
         if (lists is null || lists.Count(n => n != null) == 0)
