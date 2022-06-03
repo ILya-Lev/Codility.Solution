@@ -1,7 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-
-namespace LeetCode.Tasks;
+﻿namespace LeetCode.Tasks;
 
 public class P0024SwapPairs
 {
