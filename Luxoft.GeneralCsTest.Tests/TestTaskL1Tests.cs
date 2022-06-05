@@ -1,5 +1,3 @@
-using FluentAssertions;
-
 namespace Luxoft.GeneralCsTest.Tests;
 
 [Trait("Category", "Unit")]

@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using FluentAssertions;
 using Xunit;
 
@@ -60,6 +61,16 @@ namespace Luxoft.GeneralCsTest
 
             var big = squaredA + squaredB - squaredA;
             big.Should().Be(squaredB);
+        }
+
+        [Fact]
+        public void MultiplicationSequence_4Methods_FindCorrect()
+        {
+            var numbers = Enumerable.Range(0, 10).ToArray();
+            var a = numbers.Select(n => numbers.Select(rhs => n * rhs)).ToArray();
+            var b = numbers.SelectMany(n => numbers, (lhs, rhs) => lhs * rhs).ToArray();
+            var c = numbers.Zip(numbers, (lhs, rhs) => lhs * rhs).ToArray();
+            var d = numbers.Join(numbers, outer => outer, inner => inner, (lhs, rhs) => lhs * rhs).ToArray();
         }
     }
 }
