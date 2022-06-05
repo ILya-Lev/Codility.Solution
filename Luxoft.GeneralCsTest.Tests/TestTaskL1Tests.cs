@@ -2,6 +2,7 @@ using FluentAssertions;
 
 namespace Luxoft.GeneralCsTest.Tests;
 
+[Trait("Category", "Unit")]
 public class TestTaskL1Tests
 {
     private readonly TestTaskL1 _target = new()
