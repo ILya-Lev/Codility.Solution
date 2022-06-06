@@ -5,16 +5,21 @@ using System.Linq;
 
 namespace Luxoft.GeneralCsTest;
 
-//the text is taken from here
+//the problem is described here:
 // https://www.notion.so/Test-Task-L1-e8e8891dda82467b83da37c64e7c0b28
-//on behalf of Grygoriev Viacheslav - tech lead at Hallibutron project at Luxoft
+//problem author: Grygoriev Viacheslav
+//solution author: Levandovskyi Illia
 public class TestTaskL1 : IEnumerable<(string name, int[] data)>
 {
-    //q1: do we need CI comparison? do we need culture independent comparison?
-    //q2: currently the data is stored as a dictionary for convenience;
+    //question: currently the data is stored as a dictionary for convenience and performance;
     // for the outer world it looks like a collection of tuples string+int[] - from my point of view it's convenient
     // if it does not fit the needs, a custom class could be introduced with 2 readonly properties: name+data
-    private readonly Dictionary<string, int[]> _storage = new (StringComparer.OrdinalIgnoreCase);
+    private readonly Dictionary<string, int[]> _storage;
+
+    public TestTaskL1(StringComparer nameComparer = null)
+    {
+        _storage = new Dictionary<string, int[]>(nameComparer ?? StringComparer.OrdinalIgnoreCase);
+    }
 
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
@@ -35,11 +40,8 @@ public class TestTaskL1 : IEnumerable<(string name, int[] data)>
 
     public void Add(string name, int value)
     {
-        if (!_storage.ContainsKey(name))
-            _storage.Add(name, new[] { value });
-        else
-            //it's expected reading is more common than adding values one by one into the collection
-            _storage[name] = _storage[name].Union(new[] { value }).ToArray();
+        //it's expected reading is more common than adding values one by one into the collection
+        Add(name, new[] { value });
 
         //it could be a fluent API, but to emphasis this method should be called rarely, it returns void
     }
@@ -56,10 +58,7 @@ public class TestTaskL1 : IEnumerable<(string name, int[] data)>
     {
         foreach (var (name, data) in source)
         {
-            if (!_storage.ContainsKey(name))
-                _storage.Add(name, data);
-            else
-                _storage[name] = _storage[name].Union(data).ToArray();
+            Add(name, data);
         }
     }
 
@@ -67,7 +66,7 @@ public class TestTaskL1 : IEnumerable<(string name, int[] data)>
     {
         foreach (var (name, data) in source)
         {
-            if (!_storage.ContainsKey(name)) 
+            if (!_storage.ContainsKey(name))
                 continue;
 
             var remainingItems = _storage[name].Except(data).ToArray();

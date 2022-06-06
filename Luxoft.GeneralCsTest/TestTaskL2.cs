@@ -5,21 +5,23 @@ using System.Linq;
 
 namespace Luxoft.GeneralCsTest;
 
-//the text is taken from here
+//the problem is described here:
 // https://coherent-event-437.notion.site/Test-Task-L2-5d79f691a8bf4255a8f3fefcc3435dfe
-//on behalf of Grygoriev Viacheslav - tech lead at Hallibutron project at Luxoft
+//problem author: Grygoriev Viacheslav
+//solution author: Levandovskyi Illia
 public class TestTaskL2<TElement> : IEnumerable<(string name, TElement[] data)>
 {
-    //q1: do we need CI comparison? do we need culture independent comparison?
-    //q2: currently the data is stored as a dictionary for convenience;
-    // for the outer world it looks like a collection of tuples string+int[] - from my point of view it's convenient
+    //question: currently the data is stored as a dictionary for convenience;
+    // for the outer world it looks like a collection of tuples string+T[] - from my point of view it's convenient
     // if it does not fit the needs, a custom class could be introduced with 2 readonly properties: name+data
-    private readonly Dictionary<string, TElement[]> _storage = new (StringComparer.OrdinalIgnoreCase);
+    private readonly Dictionary<string, TElement[]> _storage;
     
-    private readonly IEqualityComparer<TElement> _elementEqualityComparer;
-    public TestTaskL2(IEqualityComparer<TElement> elementEqualityComparer = null)
+    private readonly IEqualityComparer<TElement> _elementComparer;
+    public TestTaskL2(IEqualityComparer<TElement> elementComparer = null
+    , StringComparer nameComparer = null)
     {
-        _elementEqualityComparer = elementEqualityComparer ?? EqualityComparer<TElement>.Default;
+        _elementComparer = elementComparer ?? EqualityComparer<TElement>.Default;
+        _storage = new Dictionary<string, TElement[]>(nameComparer ?? StringComparer.OrdinalIgnoreCase);
     }
 
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
@@ -28,7 +30,7 @@ public class TestTaskL2<TElement> : IEnumerable<(string name, TElement[] data)>
     {
         foreach (var pair in _storage)
         {
-            //performance wise it should be ok as tuple creates a copy of _references_ to string and int[]
+            //performance wise it should be ok as tuple creates a copy of _references_ to string and T[]
             yield return (pair.Key, pair.Value);
         }
     }
@@ -41,11 +43,8 @@ public class TestTaskL2<TElement> : IEnumerable<(string name, TElement[] data)>
 
     public void Add(string name, TElement value)
     {
-        if (!_storage.ContainsKey(name))
-            _storage.Add(name, new[] { value });
-        else
-            //it's expected reading is more common than adding values one by one into the collection
-            _storage[name] = _storage[name].Union(new[] { value }, _elementEqualityComparer).ToArray();
+        //it's expected reading is more common than adding values one by one into the collection
+        Add(name, new []{value});
 
         //it could be a fluent API, but to emphasis this method should be called rarely, it returns void
     }
@@ -55,17 +54,14 @@ public class TestTaskL2<TElement> : IEnumerable<(string name, TElement[] data)>
         if (!_storage.ContainsKey(name))
             _storage.Add(name, values);
         else
-            _storage[name] = _storage[name].Union(values, _elementEqualityComparer).ToArray();
+            _storage[name] = _storage[name].Union(values, _elementComparer).ToArray();
     }
 
     public void Merge(TestTaskL2<TElement> source)
     {
         foreach (var (name, data) in source)
         {
-            if (!_storage.ContainsKey(name))
-                _storage.Add(name, data);
-            else
-                _storage[name] = _storage[name].Union(data, _elementEqualityComparer).ToArray();
+            Add(name, data);
         }
     }
 
@@ -76,7 +72,7 @@ public class TestTaskL2<TElement> : IEnumerable<(string name, TElement[] data)>
             if (!_storage.ContainsKey(name)) 
                 continue;
 
-            var remainingItems = _storage[name].Except(data, _elementEqualityComparer).ToArray();
+            var remainingItems = _storage[name].Except(data, _elementComparer).ToArray();
             if (remainingItems.Any())
                 _storage[name] = remainingItems;
             else

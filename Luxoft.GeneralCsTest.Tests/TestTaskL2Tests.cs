@@ -55,7 +55,7 @@ public class TestTaskL2Tests
     }
 
     [Fact]
-    public void Merge_HasSameName_DefaultComparer_ContainBothArraysUniqueItems()
+    public void Merge_HasSameName_DefaultComparer_ContainBothItemsWith1()
     {
         var target = new TestTaskL2<TestRecord>()
         {
@@ -75,7 +75,7 @@ public class TestTaskL2Tests
     }
 
     [Fact]
-    public void Merge_HasSameName_FirstPropertyComparer_ContainBothArraysUniqueItems()
+    public void Merge_HasSameName_FirstPropertyComparer_ContainOnlyFirstItemWith1()
     {
         var target = new TestTaskL2<TestRecord>(new TestRecordFirstPropertyComparer())
         {
@@ -112,7 +112,7 @@ public class TestTaskL2Tests
     }
 
     [Fact]
-    public void Cut_HasSameName_FirstPropertyComparer_RemoveFirstElement()
+    public void Cut_HasSameName_FirstPropertyComparer_RemoveTheFirstItem()
     {
         var target = new TestTaskL2<TestRecord>(new TestRecordFirstPropertyComparer())
         {
