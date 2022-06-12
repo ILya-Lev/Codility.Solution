@@ -17,7 +17,7 @@ namespace UjvalsProposal
     //    {
     //        InitializeComponent();
 
-    //        var bw = new BackgroundWorker();
+    //        var bw = new BackgroundWorker();//older approach
     //        bw.DoWork += bw_DoWork;
     //        bw.RunWorkerAsync();
 
@@ -56,7 +56,7 @@ namespace UjvalsProposal
         {
             InitializeComponent();
 
-            Loaded += DoWork;
+            this.Loaded += DoWork;
 
             Course = new Course
             {
