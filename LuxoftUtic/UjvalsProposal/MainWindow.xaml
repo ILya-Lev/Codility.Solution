@@ -7,29 +7,30 @@
         x:Name="mainWindow"
         Title="MainWindow" Height="450" Width="800">
     
-<StackPanel>
-    <ItemsControl ItemsSource="{Binding ElementName=mainWindow, Path=Course.Students}">
-        <ItemsControl.ItemTemplate>
+<StackPanel x:Name="spList">
+    
+    <ListBox x:Name="lbStudents" ItemsSource="{Binding Path=Students}">
+        <ListBox.ItemTemplate>
             <DataTemplate>
                 <Grid>
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="*"/>
-                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
-                    <TextBlock Text="Student name:"/>
-                    <TextBlock Text="{Binding Path= Name}" Grid.Column="1"></TextBlock>
-                    <TextBlock Text="Student age:" Grid.Row="1"></TextBlock>
-                    <TextBlock Text="{Binding Path = Age}" Grid.Column="1"></TextBlock>
+                    <TextBlock Grid.Row="0" Grid.Column="0" Text="Student name:"/>
+                    <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding Path= Name}" />
+                    <TextBlock Grid.Row="1" Grid.Column="0" Text="Student age:" />
+                    <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding Path = Age}" />
                 </Grid>
             </DataTemplate>
-        </ItemsControl.ItemTemplate>
-    </ItemsControl>
-
-    <TextBlock x:Name="tbCount"></TextBlock>
+        </ListBox.ItemTemplate>
+    </ListBox>
+    
+    <TextBlock x:Name="tbCount"/>
 </StackPanel>
     
 </Window>

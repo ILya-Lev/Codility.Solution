@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Threading;
 using UjvalsProposal.Models;
 
 namespace UjvalsProposal
@@ -80,7 +83,7 @@ namespace UjvalsProposal
                 Course.Students.Add(student);
 
                 tbCount.Text = $"Total Students: {Course.Students.Count}";
-
+                
                 await Task.Delay(TimeSpan.FromSeconds(1));
             }
         }
