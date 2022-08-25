@@ -39,13 +39,15 @@ namespace UjvalsProposal
                     Name = $"George the {i} th",
                     Age = 20 + i
                 };
-                Dispatcher.BeginInvoke(() => course.Students.Add(student), DispatcherPriority.DataBind);
-                //course.Students.Add(student);
+                course.Students.Add(student);
+                tbCount.Text = $"Total Students: {course.Students.Count}";
 
-                Dispatcher.Invoke(() => tbCount.Text = $"Total Students: {course.Students.Count}",
-                    DispatcherPriority.DataBind);
+                //Dispatcher.BeginInvoke(() => course.Students.Add(student), DispatcherPriority.DataBind);
 
-                Thread.Sleep(TimeSpan.FromSeconds(1));
+                //Dispatcher.Invoke(() => tbCount.Text = $"Total Students: {course.Students.Count}",
+                //DispatcherPriority.DataBind);
+
+                //Thread.Sleep(TimeSpan.FromSeconds(1));
             }
         }
 
