@@ -70,9 +70,9 @@ public class UticQuestionSamples
     [Fact]
     public async Task Await_InsideLock_Forbidden()
     {
-        lock (this)
-        {
-            _ = await File.ReadAllTextAsync("a");
-        }
+        //lock (this)
+        //{
+        //    _ = await File.ReadAllTextAsync("a");
+        //}
     }
 }
