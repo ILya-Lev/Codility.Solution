@@ -1,4 +1,6 @@
-﻿namespace Coderbyte;
+﻿using System.Text;
+
+namespace Coderbyte;
 /// <summary>
 /// Develop a C# project that consists of multiple classes to implement a file system organizer. The project should contain the following functionality:
 /// 1. Class FileOrganizer:

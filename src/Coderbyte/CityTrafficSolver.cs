@@ -12,7 +12,7 @@
 
 public class CityTrafficSolver
 {
-    public class Node
+    private class Node
     {
         public int N { get; init; }
         public List<Node> Next { get; } = new();
