@@ -8,22 +8,26 @@ public class PatternChaser
     {
         //naive impl
         var patterns = new HashSet<string>();
+        var nonPatterns = new HashSet<string>();
         for (int outerShift = 0; outerShift < str.Length - 3; outerShift++)
         {
             for (int m = (str.Length - outerShift) / 2; m >= 2; m--)
             {
-                var pattern = str.Substring(outerShift, m);
-                if (patterns.Contains(pattern))
+                var candidate = str.Substring(outerShift, m);
+                if (patterns.Contains(candidate) || nonPatterns.Contains(candidate))
                     break;
 
                 for (int shift = outerShift + m; shift + m <= str.Length; shift++)
                 {
-                    if (str.Substring(shift, m).Equals(pattern))
+                    if (str.Substring(shift, m).Equals(candidate))
                     {
-                        patterns.Add(pattern);
+                        patterns.Add(candidate);
                         break;
                     }
                 }
+
+                if (!patterns.Contains(candidate))
+                    nonPatterns.Add(candidate);
             }
         }
 
