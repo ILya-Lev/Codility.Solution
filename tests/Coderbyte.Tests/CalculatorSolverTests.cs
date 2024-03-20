@@ -36,4 +36,20 @@ public class CalculatorSolverTests
         var result = CalculatorSolver.Calculator(input);
         result.Should().Be("-5");
     }
+
+    [Fact]
+    public void Calculator_Negatives_MatchExpectation()
+    {
+        var input = "5-(3-4)";
+        var result = CalculatorSolver.Calculator(input);
+        result.Should().Be("6");
+    }
+
+    [Fact]
+    public void Calculator_NegativeAndPositive_MatchExpectation()
+    {
+        var input = "5(3-4+1)";
+        var result = CalculatorSolver.Calculator(input);
+        result.Should().Be("0");
+    }
 }

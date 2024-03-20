@@ -90,6 +90,10 @@ public class CalculatorSolver
         var current = afterEnd - 1;
         while (current >= 0 && char.IsDigit(str[current]))
             current--;
+        
+        if (current >= 0 && str[current] == S)
+            current--;//keep trailing minus
+
         return current + 1;//as we expect the loop to be hit at least once
     }
 
