@@ -2,8 +2,14 @@
 
 public record Rational(int N, int D);
 
+/// <summary>
+/// what about comparing with https://github.com/tompazourek/Rationals ?
+/// </summary>
 public static class RationalExtensions
 {
+    public static Rational Zero { get; } = new Rational(0, 1);
+    public static Rational One { get; } = new Rational(1, 1);
+
     public static string AsString(this Rational r)
     {
         var reduced = r.Reduce();
@@ -30,6 +36,24 @@ public static class RationalExtensions
     public static Rational Subtract(this Rational lhs, Rational rhs) => lhs.Add(rhs.Multiply(-1)).Reduce();
 
     public static Rational Subtract(this Rational r, int n) => r.Add(-1*n).Reduce();
+
+    public static Rational Invert(this Rational r) => new Rational(r.D, r.N).Reduce();
+    
+    public static Rational Negate(this Rational r) => r.Multiply(-1);
+    
+    public static Rational Abs(this Rational r) => new Rational(Math.Abs(r.N), Math.Abs(r.D));
+    
+    public static Rational Pow(this Rational r, int power) 
+        => new Rational((int)Math.Pow(r.N, power), (int)Math.Pow(r.D, power)).Reduce();
+    
+    public static Rational Sqrt(this Rational r) 
+        => new Rational((int)Math.Sqrt(r.N), (int)Math.Sqrt(r.D)).Reduce();
+
+    public static double Root(this Rational r, double pow) => pow == 0 ? 1.0 : Math.Pow(r.N * 1.0 / r.D, 1.0 / pow);
+
+    public static double Pow(this Rational r, double pow) => pow == 0 ? 1.0 : Math.Pow(r.N * 1.0 / r.D, pow);
+    
+    public static double Log(this Rational r, double basis) => Math.Log(r.N, basis) - Math.Log(r.D, basis);
 
     public static Rational Reduce(this Rational r)
     {
