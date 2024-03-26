@@ -2,6 +2,7 @@ using FluentAssertions;
 
 namespace Coderbyte.Tests;
 
+[Trait("Category", "Unit")]
 public class CityTrafficTests
 {
     public static object[][] GetData() => new[]
