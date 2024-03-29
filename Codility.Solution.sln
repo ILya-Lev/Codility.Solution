@@ -53,9 +53,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeKataCom", "src\CodeKata
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeKataComTests", "tests\CodeKataComTests\CodeKataComTests.csproj", "{1BB2C17D-F943-45E7-AF11-5F6AC7EEB1D0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Coderbyte", "src\Coderbyte\Coderbyte.csproj", "{EE8DD00D-95B4-4FEB-B991-4BB12004E920}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Coderbyte", "src\Coderbyte\Coderbyte.csproj", "{EE8DD00D-95B4-4FEB-B991-4BB12004E920}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Coderbyte.Tests", "tests\Coderbyte.Tests\Coderbyte.Tests.csproj", "{60E61F1C-D365-4A33-A209-91005AE1277D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Coderbyte.Tests", "tests\Coderbyte.Tests\Coderbyte.Tests.csproj", "{60E61F1C-D365-4A33-A209-91005AE1277D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HackerRank", "HackerRank\HackerRank.csproj", "{AD4637D5-54D8-4255-83B9-8E312C6D0030}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HackerRank.Tests", "tests\HackerRank.Tests\HackerRank.Tests.csproj", "{6A5388C4-13DB-4A30-AC76-D33481FD9B88}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -155,6 +159,14 @@ Global
 		{60E61F1C-D365-4A33-A209-91005AE1277D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{60E61F1C-D365-4A33-A209-91005AE1277D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{60E61F1C-D365-4A33-A209-91005AE1277D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AD4637D5-54D8-4255-83B9-8E312C6D0030}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AD4637D5-54D8-4255-83B9-8E312C6D0030}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AD4637D5-54D8-4255-83B9-8E312C6D0030}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AD4637D5-54D8-4255-83B9-8E312C6D0030}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6A5388C4-13DB-4A30-AC76-D33481FD9B88}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6A5388C4-13DB-4A30-AC76-D33481FD9B88}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6A5388C4-13DB-4A30-AC76-D33481FD9B88}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6A5388C4-13DB-4A30-AC76-D33481FD9B88}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -183,6 +195,8 @@ Global
 		{1BB2C17D-F943-45E7-AF11-5F6AC7EEB1D0} = {B90D9BE0-C591-4E48-87AB-6F2B5DC6A18A}
 		{EE8DD00D-95B4-4FEB-B991-4BB12004E920} = {C4DE70BD-0520-4FA5-9596-7558B1C15AA5}
 		{60E61F1C-D365-4A33-A209-91005AE1277D} = {B90D9BE0-C591-4E48-87AB-6F2B5DC6A18A}
+		{AD4637D5-54D8-4255-83B9-8E312C6D0030} = {C4DE70BD-0520-4FA5-9596-7558B1C15AA5}
+		{6A5388C4-13DB-4A30-AC76-D33481FD9B88} = {B90D9BE0-C591-4E48-87AB-6F2B5DC6A18A}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {7A20C9ED-DC05-4812-93A2-813861F04B0E}
