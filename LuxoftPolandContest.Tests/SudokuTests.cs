@@ -53,6 +53,32 @@ public class SudokuTests(ITestOutputHelper output)
 
         Print(solvedField);
         solvedField.Cells.Should().NotContain(c => c.Value.IsEmpty);
+        Sudoku.IsConsistent(solvedField).Should().BeTrue();
+    }
+
+    [Fact]
+    public void Solve_Expert002_Solved()
+    {
+        var digits = new int[][]
+        {
+            [0,6,0,0,0,7,0,0,0],
+            [1,0,0,0,8,0,0,0,4],
+            [0,0,0,9,1,0,0,0,0],
+            [0,0,0,0,0,0,0,0,0],
+            [0,0,0,3,0,0,0,2,6],
+            [4,7,0,0,0,6,8,0,0],
+            [6,0,5,0,0,2,4,7,0],
+            [0,0,0,0,0,8,1,0,0],
+            [0,0,9,0,0,0,0,3,0]
+        };
+
+        var field = Sudoku.Create(digits);
+
+        var solvedField = Sudoku.Solve(field);
+
+        Print(solvedField);
+        solvedField.Cells.Should().NotContain(c => c.Value.IsEmpty);
+        Sudoku.IsConsistent(solvedField).Should().BeTrue();
     }
 
     private void Print(Sudoku.Field field)
