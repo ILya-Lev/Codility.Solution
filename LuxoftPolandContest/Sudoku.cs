@@ -49,9 +49,19 @@ public static class Sudoku
         .GroupBy(c => c.Digit)
         .All(g => g.Count() == 1);
 
-    private static bool IsConsistentWithStructure(Cell[] structure, int digit)
-        => IsConsistentStructure(structure)
-        && structure.Where(c => !c.IsEmpty).All(c => c.Digit != digit);
+    private static bool IsConsistentWithStructure(Field field, Position position, int digit)
+    {
+        var row = field.Cells.Values.Where(c => c.Position.Row == position.Row).ToArray();
+        var column = field.Cells.Values.Where(c => c.Position.Column == position.Column).ToArray();
+        var square = field.Cells.Values.Where(c => c.Position.Square == position.Square).ToArray();
+        
+        return IsConsistentStructure(row)
+               && IsConsistentStructure(column)
+               && IsConsistentStructure(square)
+               && row.Where(c => !c.IsEmpty).All(c => c.Digit != digit)
+               && column.Where(c => !c.IsEmpty).All(c => c.Digit != digit)
+               && square.Where(c => !c.IsEmpty).All(c => c.Digit != digit);
+    }
 
     public static int CountEmptyCells(Field field) => field.Cells.Values.Count(c => c.IsEmpty);
 
@@ -98,7 +108,7 @@ public static class Sudoku
     public static Field Solve(Field field)
     {
         var emptyCounter = Size * Size;
-        var attempt = 3;
+        var attempt = 40;
         while (attempt-- > 0)
         {
             while (emptyCounter != CountEmptyCells(field))
@@ -117,7 +127,8 @@ public static class Sudoku
             ReduceOptionsByTracedRays(field);
             ApplyToStructures(field, ReduceOptionsByFilledDigits);
 
-            //RefillOptions(field);
+            if (attempt % 4 == 0 && attempt > 0)
+                RefillOptions(field);
         }
 
         return field;
@@ -129,7 +140,7 @@ public static class Sudoku
         foreach (var cell in structure.Where(c => c.IsEmpty))
         {
             var missing = cell.Missing.Except(filledInDigits).ToArray();
-            if (missing.Length == 1 && IsConsistentWithStructure(structure, missing[0]))
+            if (missing.Length == 1 && IsConsistentWithStructure(field, cell.Position, missing[0]))
             {
                 field.Cells[cell.Position] = cell with { Digit = missing[0] };
                 return;
@@ -179,7 +190,7 @@ public static class Sudoku
 
         foreach (var (digit, cell) in oneCellOptions)
         {
-            if (IsConsistentWithStructure(structure, digit))
+            if (IsConsistentWithStructure(field, cell.Position, digit))
                 field.Cells[cell.Position] = cell with { Digit = digit };
         }
     }
